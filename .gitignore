@@ -1,0 +1,11 @@
+*~
+*.plt
+erl_crash.dump
+deps
+.eunit
+.DS_Store
+.erlang.mk.*
+ebin
+_rel
+relx
+

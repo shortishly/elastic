@@ -1,0 +1,15 @@
+#!/usr/bin/env escript
+%% -*- erlang -*-
+%%
+
+main([]) ->
+    {application, Name, _} = application(),
+    io:format("~w~n", [Name]).
+
+app_src() ->
+    [Filename] = filelib:wildcard(filename:join([filename:dirname(escript:script_name()), "../src/*.app.src"])),
+    Filename.
+
+application() ->
+    {ok, [{application, _, _} = Application]} = file:consult(app_src()),
+    Application.
