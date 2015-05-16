@@ -30,14 +30,14 @@ make() ->
 get_env(Key) ->
     gproc:get_env(l, ?MODULE, Key, [os_env, app_env]).
 
--type index() :: hourly | daily | monthly | yearly.
+-type index_type() :: hourly | daily | monthly | yearly.
 
 
--spec index_document(index(), iolist(), iolist(), iolist()) -> {ok, map()} | {error, binary()}.
+-spec index_document(index_type(), iolist(), iolist(), iolist()) -> {ok, map()} | {error, binary()}.
 index_document(Index, Type, Id, Document) ->
     elastic_http:index(connection(), index(Index), Type, Id, Document).
 
--spec index_document(index(), iolist(), iolist()) -> {ok, map()} | {error, binary()}.
+-spec index_document(index_type(), iolist(), iolist()) -> {ok, map()} | {error, binary()}.
 index_document(Index, Type, Document) ->
     elastic_http:index(connection(), index(Index), Type, Document).
 
@@ -45,15 +45,19 @@ connection() ->
     {ok, Connection} = elastic_http_supervisor:start_child(tcp_addr(), tcp_port()),
     Connection.
 
+-spec tcp_addr() -> list().
 tcp_addr() ->
     get_env(elasticsearch_port_9200_tcp_addr).
 
+-spec tcp_port() -> list().
 tcp_port() ->
     get_env(elasticsearch_port_9200_tcp_port).
 
+-spec index(index_type()) -> iolist().
 index(Type) ->
-    [prefix(), "-", postfix(Type)].
+    [get_env(index_prefix), "-", postfix(Type)].
 
+-spec postfix(index_type()) -> iolist().
 postfix(hourly) ->
     {{Year, Month, Date}, {Hour, _, _}} = erlang:universaltime(),
     io_lib:format("~4..0b.~2..0b.~2..0b.~2..0b", [Year, Month, Date, Hour]);
@@ -66,6 +70,3 @@ postfix(monthly) ->
 postfix(yearly) ->
     {{Year, _, _}, _} = erlang:localtime(),
     io_lib:format("~4..0b", [Year]).
-
-prefix() ->
-    elastic:get_env(index_prefix).

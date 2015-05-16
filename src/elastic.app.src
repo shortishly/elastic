@@ -27,5 +27,9 @@
 					jsx
 				       ]},
 			{mod, {elastic_application, []}},
-			{env, [{index_prefix, "logstash"}]}
+			{env, [
+			       {elasticsearch_port_9200_tcp_addr, "127.0.0.1"},
+			       {elasticsearch_port_9200_tcp_port, "9200"},
+			       {index_prefix, "logstash"}
+			      ]}
 		       ]}.
