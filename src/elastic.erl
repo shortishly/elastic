@@ -33,11 +33,11 @@ get_env(Key) ->
 -type index() :: hourly | daily | monthly | yearly.
 
 
--spec index_document(index(), iolist(), iolist(), iolist()) -> {ok, map()}.
+-spec index_document(index(), iolist(), iolist(), iolist()) -> {ok, map()} | {error, binary()}.
 index_document(Index, Type, Id, Document) ->
     elastic_http:index(connection(), index(Index), Type, Id, Document).
 
--spec index_document(index(), iolist(), iolist()) -> {ok, map()}.
+-spec index_document(index(), iolist(), iolist()) -> {ok, map()} | {error, binary()}.
 index_document(Index, Type, Document) ->
     elastic_http:index(connection(), index(Index), Type, Document).
 
