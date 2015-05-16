@@ -65,10 +65,12 @@ handle_info({gun_data, Gun, Stream, fin, Body}, #{gun := Gun} = S) ->
     From = maps:get(Stream, S),
     case jsx:decode(Body, [return_maps]) of
 	#{<<"error">> := Reason} ->
-	    gen_server:reply(From, {error, Reason});
+	    gen_server:reply(From, {error, Reason}),
+	    {stop, normal, S};
 
 	Response ->
-	    gen_server:reply(From, {ok, Response})
+	    gen_server:reply(From, {ok, Response}),
+	    {stop, normal, S};
     end;
 
 handle_info(open, #{host := Host, port := Port} = S) ->
