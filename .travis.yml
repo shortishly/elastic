@@ -1,0 +1,6 @@
+---
+language: erlang
+script: "make"
+otp_release:
+  - 17.4
+  
