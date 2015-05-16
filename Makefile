@@ -14,5 +14,5 @@
 # limitations under the License.
 #
 PROJECT = elastic
-DEPS = gproc gun
+DEPS = gproc gun jsx
 include erlang.mk

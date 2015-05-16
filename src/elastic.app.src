@@ -23,8 +23,9 @@
 					kernel,
 					stdlib,
 					gproc,
-					gun
+					gun,
+					jsx
 				       ]},
 			{mod, {elastic_application, []}},
-			{env, []}
+			{env, [{index_prefix, "logstash"}]}
 		       ]}.

@@ -64,7 +64,7 @@ handle_info({gun_response, Gun, _Stream, nofin, _Status, _Headers}, #{gun := Gun
 handle_info({gun_data, Gun, Stream, fin, Body}, #{gun := Gun} = S) ->
     case maps:find(Stream, S) of
 	{ok, From} ->
-	    gen_server:reply(From, {ok, Body}),
+	    gen_server:reply(From, {ok, jsx:decode(Body, [return_maps])}),
 	    {stop, normal, S};
 
 	error ->

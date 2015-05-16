@@ -17,8 +17,8 @@
 	 start/0,
 	 make/0,
 	 get_env/1,
-	 index/4,
-	 index/3
+	 index_document/4,
+	 index_document/3
 	]).
 
 start() ->
@@ -30,12 +30,42 @@ make() ->
 get_env(Key) ->
     gproc:get_env(l, ?MODULE, Key, [os_env, app_env]).
 
-index(Index, Type, Id, Document) ->
-    {ok, Elastic} = elastic_http_supervisor:start_child(get_env(elasticsearch_port_9200_tcp_addr),
-							get_env(elasticsearch_port_9200_tcp_port)),
-    elastic_http:index(Elastic, Index, Type, Id, Document).
+-type index() :: hourly | daily | monthly | yearly.
 
-index(Index, Type, Document) ->
-    {ok, Elastic} = elastic_http_supervisor:start_child(get_env(elasticsearch_port_9200_tcp_addr),
-							get_env(elasticsearch_port_9200_tcp_port)),
-    elastic_http:index(Elastic, Index, Type, Document).
+
+-spec index_document(index(), iolist(), iolist(), iolist()) -> {ok, map()}.
+index_document(Index, Type, Id, Document) ->
+    elastic_http:index(connection(), index(Index), Type, Id, Document).
+
+-spec index_document(index(), iolist(), iolist()) -> {ok, map()}.
+index_document(Index, Type, Document) ->
+    elastic_http:index(connection(), index(Index), Type, Document).
+
+connection() ->
+    {ok, Connection} = elastic_http_supervisor:start_child(tcp_addr(), tcp_port()),
+    Connection.
+
+tcp_addr() ->
+    get_env(elasticsearch_port_9200_tcp_addr).
+
+tcp_port() ->
+    get_env(elasticsearch_port_9200_tcp_port).
+
+index(Type) ->
+    [prefix(), "-", postfix(Type)].
+
+postfix(hourly) ->
+    {{Year, Month, Date}, {Hour, _, _}} = erlang:universaltime(),
+    io_lib:format("~4..0b.~2..0b.~2..0b.~2..0b", [Year, Month, Date, Hour]);
+postfix(daily) ->
+    {{Year, Month, Date}, _} = erlang:localtime(),
+    io_lib:format("~4..0b.~2..0b.~2..0b", [Year, Month, Date]);
+postfix(monthly) ->
+    {{Year, Month, _}, _} = erlang:localtime(),
+    io_lib:format("~4..0b.~2..0b", [Year, Month]);
+postfix(yearly) ->
+    {{Year, _, _}, _} = erlang:localtime(),
+    io_lib:format("~4..0b", [Year]).
+
+prefix() ->
+    elastic:get_env(index_prefix).
