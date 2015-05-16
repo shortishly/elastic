@@ -70,7 +70,7 @@ handle_info({gun_data, Gun, Stream, fin, Body}, #{gun := Gun} = S) ->
 
 	Response ->
 	    gen_server:reply(From, {ok, Response}),
-	    {stop, normal, S};
+	    {stop, normal, S}
     end;
 
 handle_info(open, #{host := Host, port := Port} = S) ->
