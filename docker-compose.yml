@@ -1,4 +1,11 @@
-search:
+elasticsearch:
   image: elasticsearch
   ports:
     - "9200:9200"
+
+kibana:
+  image: kibana
+  links:
+    - elasticsearch
+  ports:
+    - "5601:5601"

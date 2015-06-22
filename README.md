@@ -27,13 +27,23 @@ docker-compose start
 To index a document:
 
 ```erlang
-elastic:index_document(hourly, "stats", "{}").
-{ok,#{<<"_id">> => <<"AU1cyBfR_TWT0pl8At7u">>,
-      <<"_index">> => <<"logstash-2015.05.16.12">>,
+elastic:index_document(daily, "stats", jsx:encode(#{timestamp => erlang:universaltime(), message => <<"hello world">>})). 
+{ok,#{<<"_id">> => <<"AU4cOmHP2oVYagdYKPh5">>,
+      <<"_index">> => <<"logstash-2015.06.22">>,
       <<"_type">> => <<"stats">>,
       <<"_version">> => 1,
       <<"created">> => true}}
 ```
+
+In Kibana, create a new index by selecting: "settings", followed by
+"add new" index pattern. Ensure that both "index contains time-based
+events" and also "use event times to create index names", with "daily"
+as the index pattern interval. The "time-field name" should populate
+with "timestamp" (otherwise a quick "refresh fields" should sort it).
+
+Once the index is created, you can navigate to "Discover" and view the
+indexed data in Kibana.
+
 
 ## Environment
 
