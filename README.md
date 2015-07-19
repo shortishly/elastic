@@ -27,7 +27,7 @@ docker-compose start
 To index a document:
 
 ```erlang
-elastic:index_document(hourly, "stats", "{}").
+elastic:index_document(hourly, "stats", #{timestamp => erlang:universaltime()}).
 {ok,#{<<"_id">> => <<"AU1cyBfR_TWT0pl8At7u">>,
       <<"_index">> => <<"logstash-2015.05.16.12">>,
       <<"_type">> => <<"stats">>,

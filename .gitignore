@@ -8,4 +8,4 @@ deps
 ebin
 _rel
 relx
-
+.erlang.mk
