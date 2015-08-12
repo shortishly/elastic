@@ -33,11 +33,11 @@ start_link(Host, Port) ->
 
 -spec index(pid(), iodata(), iodata(), iodata(), iodata()) -> iodata().
 index(Elastic, Index, Type, Id, Document) ->
-    gen_server:call(Elastic, {index, Index, Type, Id, Document}).
+    gen_server:call(Elastic, {index, Index, Type, Id, Document}, infinity).
 
 -spec index(pid(), iodata(), iodata(), iodata()) -> iodata().
 index(Elastic, Index, Type, Document) ->
-    gen_server:call(Elastic, {index, Index, Type, Document}).
+    gen_server:call(Elastic, {index, Index, Type, Document}, infinty).
 
 init([Host, Port]) ->
     self() ! open,
