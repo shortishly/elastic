@@ -37,7 +37,7 @@ index(Elastic, Index, Type, Id, Document) ->
 
 -spec index(pid(), iodata(), iodata(), iodata()) -> iodata().
 index(Elastic, Index, Type, Document) ->
-    gen_server:call(Elastic, {index, Index, Type, Document}, infinty).
+    gen_server:call(Elastic, {index, Index, Type, Document}, infinity).
 
 init([Host, Port]) ->
     self() ! open,
