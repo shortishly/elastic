@@ -16,8 +16,7 @@
 -behaviour(gen_server).
 -export([
 	 start_link/2,
-         index/5,
-         index/4
+         index/2
 	]).
 -export([
 	 init/1,
@@ -31,13 +30,9 @@
 start_link(Host, Port) ->
     gen_server:start_link(?MODULE, [Host, Port], []).
 
--spec index(pid(), iodata(), iodata(), iodata(), iodata()) -> iodata().
-index(Elastic, Index, Type, Id, Document) ->
-    gen_server:call(Elastic, {index, Index, Type, Id, Document}, infinity).
-
--spec index(pid(), iodata(), iodata(), iodata()) -> iodata().
-index(Elastic, Index, Type, Document) ->
-    gen_server:call(Elastic, {index, Index, Type, Document}, infinity).
+-spec index(pid(), map()) -> iodata().
+index(Elastic, Parameters) ->
+    gen_server:call(Elastic, {index, Parameters}).
 
 init([Host, Port]) ->
     case gun:open(Host, list_to_integer(Port)) of
