@@ -16,8 +16,8 @@
 -behaviour(gen_server).
 -export([
 	 start_link/2,
-	 index/5,
-	 index/4
+         index/5,
+         index/4
 	]).
 -export([
 	 init/1,
@@ -40,45 +40,38 @@ index(Elastic, Index, Type, Document) ->
     gen_server:call(Elastic, {index, Index, Type, Document}, infinity).
 
 init([Host, Port]) ->
-    self() ! open,
-    {ok, #{host => Host, port => list_to_integer(Port)}}.
+    case gun:open(Host, list_to_integer(Port)) of
+	{ok, Gun} ->
+	    {ok, #{gun => Gun}};
 
-handle_call({index, Index, Type, Id, Document}, Reply, #{gun := Gun} = S) ->
-    Stream = gun:put(Gun, [Index, "/", Type, "/", Id], [], Document),
-    {noreply, maps:put(Stream, Reply, S)};
+	{error, _} = Error ->
+	    {stop, Error, stateless}
+    end.
 
-handle_call({index, Index, Type, Document}, Reply, #{gun := Gun} = S) ->
-    Stream = gun:post(Gun, [Index, "/", Type, "/"], [], Document),
-    {noreply, maps:put(Stream, Reply, S)}.
+handle_call({index, #{index := Index, type := Type, id := Id, document := Document}}, Reply, #{gun := Gun} = S) ->
+    {noreply, maps:put(gun:put(Gun, [Index, "/", Type, "/", Id], [], Document), Reply, S)};
+
+handle_call({index, #{index := Index, type := Type, document := Document}}, Reply, #{gun := Gun} = S) ->
+    {noreply, maps:put(gun:post(Gun, [Index, "/", Type, "/"], [], Document), Reply, S)}.
 
 handle_cast(stop, S) ->
     {stop, normal, S}.
 
-
 handle_info({gun_up, Gun, http}, #{gun := Gun} = S) ->
     {noreply, S};
 
-handle_info({gun_response, Gun, _Stream, nofin, _Status, _Headers}, #{gun := Gun} = S) ->
+handle_info({gun_response, Gun, _, nofin, _Status, _Headers}, #{gun := Gun} = S) ->
     {noreply, S};
 
 handle_info({gun_data, Gun, Stream, fin, Body}, #{gun := Gun} = S) ->
-    From = maps:get(Stream, S),
     case jsx:decode(Body, [return_maps]) of
 	#{<<"error">> := Reason} ->
-	    gen_server:reply(From, {error, Reason}),
+	    gen_server:reply(maps:get(Stream, S), {error, Reason}),
 	    {stop, normal, S};
 
 	Response ->
-	    gen_server:reply(From, {ok, Response}),
+	    gen_server:reply(maps:get(Stream, S), {ok, Response}),
 	    {stop, normal, S}
-    end;
-
-handle_info(open, #{host := Host, port := Port} = S) ->
-    case gun:open(Host, Port) of
-	{ok, Gun} ->
-	    {noreply, S#{gun => Gun}};
-	{error, Reason} ->
-	    {stop, Reason, S}
     end.
 
 code_change(_, State, _) ->
@@ -86,4 +79,3 @@ code_change(_, State, _) ->
 
 terminate(_, _) ->
     ok.
-

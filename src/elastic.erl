@@ -30,16 +30,32 @@ make() ->
 get_env(Key) ->
     gproc:get_env(l, ?MODULE, Key, [os_env, app_env]).
 
--type index_type() :: hourly | daily | monthly | yearly.
+-type index() :: hourly | daily | monthly | yearly.
 
+-spec index_document(index(), iolist(), map() | iolist()) -> {ok, map()} | {error, binary()}.
+index_document(Index, Type, #{timestamp := {{_, _, _}, {_, _, _}} = DateTime} = Document) ->
+    elastic_http:index(connection(), #{index => index(Index, DateTime),
+                                       type => Type,
+                                       document => jsx:encode(Document)});
 
--spec index_document(index_type(), iolist(), iolist(), iolist()) -> {ok, map()} | {error, binary()}.
-index_document(Index, Type, Id, Document) ->
-    elastic_http:index(connection(), index(Index), Type, Id, Document).
+index_document(Index, Type, #{} = Document) ->
+    elastic_http:index(connection(), #{index => index(Index),
+                                       type => Type,
+                                       document => jsx:encode(Document)});
 
--spec index_document(index_type(), iolist(), iolist()) -> {ok, map()} | {error, binary()}.
 index_document(Index, Type, Document) ->
-    elastic_http:index(connection(), index(Index), Type, Document).
+    elastic_http:index(connection(), #{index => index(Index),
+                                       type => Type,
+                                       document => Document}).
+
+-spec index_document(index(), iolist(), iolist(), map()) -> {ok, map()} | {error, binary()}.
+index_document(Index, Type, Id,  #{timestamp := {{_, _, _}, {_, _, _}} = DateTime} = Document) ->
+    elastic_http:index(connection(), #{index => index(Index, DateTime), type => Type, id => Id, document => jsx:encode(Document)});
+index_document(Index, Type, Id,  #{} = Document) ->
+    elastic_http:index(connection(), #{index => index(Index), type => Type, id => Id, document => jsx:encode(Document)});
+index_document(Index, Type, Id,  Document) ->
+    elastic_http:index(connection(), #{index => index(Index), type => Type, id => Id, document => Document}).
+
 
 connection() ->
     {ok, Connection} = elastic_http_supervisor:start_child(tcp_addr(), tcp_port()),
@@ -53,20 +69,21 @@ tcp_addr() ->
 tcp_port() ->
     get_env(elasticsearch_port_9200_tcp_port).
 
--spec index(index_type()) -> iolist().
+-spec index(index()) -> iolist().
 index(Type) ->
-    [get_env(index_prefix), "-", postfix(Type)].
+    index(Type, erlang:universaltime()).
 
--spec postfix(index_type()) -> iolist().
-postfix(hourly) ->
-    {{Year, Month, Date}, {Hour, _, _}} = erlang:universaltime(),
+-spec index(index(), calendar:datetime()) -> iolist().
+index(Type, DateTime) ->
+    [get_env(index_prefix), "-", postfix(Type, DateTime)].
+
+
+-spec postfix(index(), calendar:datetime()) -> iolist().
+postfix(hourly, {{Year, Month, Date}, {Hour, _, _}}) ->
     io_lib:format("~4..0b.~2..0b.~2..0b.~2..0b", [Year, Month, Date, Hour]);
-postfix(daily) ->
-    {{Year, Month, Date}, _} = erlang:localtime(),
+postfix(daily, {{Year, Month, Date}, _}) ->
     io_lib:format("~4..0b.~2..0b.~2..0b", [Year, Month, Date]);
-postfix(monthly) ->
-    {{Year, Month, _}, _} = erlang:localtime(),
+postfix(monthly, {{Year, Month, _}, _}) ->
     io_lib:format("~4..0b.~2..0b", [Year, Month]);
-postfix(yearly) ->
-    {{Year, _, _}, _} = erlang:localtime(),
+postfix(yearly, {{Year, _, _}, _}) ->
     io_lib:format("~4..0b", [Year]).
