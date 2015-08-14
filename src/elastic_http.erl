@@ -72,5 +72,5 @@ handle_info({gun_data, Gun, Stream, fin, Body}, #{gun := Gun} = S) ->
 code_change(_, State, _) ->
     {ok, State}.
 
-terminate(_, _) ->
-    ok.
+terminate(_, #{gun := Gun}) ->
+    gun:close(Gun).
