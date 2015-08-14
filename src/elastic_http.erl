@@ -32,7 +32,7 @@ start_link(Host, Port) ->
 
 -spec index(pid(), map()) -> iodata().
 index(Elastic, Parameters) ->
-    gen_server:call(Elastic, {index, Parameters}, infinty).
+    gen_server:call(Elastic, {index, Parameters}, infinity).
 
 init([Host, Port]) ->
     case gun:open(Host, list_to_integer(Port)) of
