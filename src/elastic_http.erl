@@ -30,9 +30,9 @@
 start_link(Host, Port) ->
     gen_server:start_link(?MODULE, [Host, Port], []).
 
--spec index(pid(), map()) -> {ok, map()} | {error, binary()}.
+-spec index(pid(), map()) -> iodata().
 index(Elastic, Parameters) ->
-    gen_server:call(Elastic, {index, Parameters}).
+    gen_server:call(Elastic, {index, Parameters}, infinity).
 
 init([Host, Port]) ->
     case gun:open(Host, list_to_integer(Port)) of
@@ -72,5 +72,5 @@ handle_info({gun_data, Gun, Stream, fin, Body}, #{gun := Gun} = S) ->
 code_change(_, State, _) ->
     {ok, State}.
 
-terminate(_, _) ->
-    ok.
+terminate(_, #{gun := Gun}) ->
+    gun:close(Gun).
