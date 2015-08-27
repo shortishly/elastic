@@ -1,35 +1,12 @@
 %%-*- mode: erlang -*-
-%% Copyright (c) 2012-2015 Peter Morgan <peter.james.morgan@gmail.com>
-%%
-%% Licensed under the Apache License, Version 2.0 (the "License");
-%% you may not use this file except in compliance with the License.
-%% You may obtain a copy of the License at
-%%
-%% http://www.apache.org/licenses/LICENSE-2.0
-%%
-%% Unless required by applicable law or agreed to in writing, software
-%% distributed under the License is distributed on an "AS IS" BASIS,
-%% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-%% See the License for the specific language governing permissions and
-%% limitations under the License.
-
-{application, elastic, [
-			{description, "Elasticsearch client API"},
-			{vsn, "0.1.0"},
-			{id, "git"},
-			{modules, []},
-			{registered, []},
-			{applications, [
-					kernel,
-					stdlib,
-					gproc,
-					gun,
-					jsx
-				       ]},
-			{mod, {elastic_application, []}},
-			{env, [
-			       {elasticsearch_port_9200_tcp_addr, "127.0.0.1"},
-			       {elasticsearch_port_9200_tcp_port, "9200"},
-			       {index_prefix, "logstash"}
-			      ]}
-		       ]}.
+{application,elastic,
+             [{description,"Elasticsearch client API"},
+              {vsn,"0.1.2"},
+              {id,"git"},
+              {modules,[]},
+              {registered,[]},
+              {applications,[kernel,stdlib,gproc,gun,jsx]},
+              {mod,{elastic_application,[]}},
+              {env,[{elasticsearch_port_9200_tcp_addr,"127.0.0.1"},
+                    {elasticsearch_port_9200_tcp_port,"9200"},
+                    {index_prefix,"logstash"}]}]}.
