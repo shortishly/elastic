@@ -85,7 +85,7 @@ git branch -d release/${RELEASE}
 # Checkout develop and merge the new master in.
 #
 git checkout develop
-git merge master
+git merge -m "merging master into develop for release ${RELEASE}" master
 
 function rollback {
     # Something bad happened during the build, roll back
