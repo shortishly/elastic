@@ -16,7 +16,7 @@
 
 ERLANG_MK_FILENAME := $(realpath $(lastword $(MAKEFILE_LIST)))
 
-ERLANG_MK_VERSION = 1.2.0-631-g56cbd9e
+ERLANG_MK_VERSION = 1.2.0-649-ga0563a4
 
 # Core configuration.
 
@@ -136,7 +136,7 @@ endef
 
 # Adding erlang.mk to make Erlang scripts who call init:get_plain_arguments() happy.
 define erlang
-$(ERL) -pz $(ERLANG_MK_TMP)/rebar/ebin -eval "$(subst $(newline),,$(subst ",\",$(1)))" -- erlang.mk
+$(ERL) $(2) -pz $(ERLANG_MK_TMP)/rebar/ebin -eval "$(subst $(newline),,$(subst ",\",$(1)))" -- erlang.mk
 endef
 
 ifeq ($(shell which wget 2>/dev/null | wc -l), 1)
@@ -3140,6 +3140,14 @@ pkg_rfc4627_jsonrpc_fetch = git
 pkg_rfc4627_jsonrpc_repo = https://github.com/tonyg/erlang-rfc4627
 pkg_rfc4627_jsonrpc_commit = master
 
+PACKAGES += riak_control
+pkg_riak_control_name = riak_control
+pkg_riak_control_description = Webmachine-based administration interface for Riak.
+pkg_riak_control_homepage = https://github.com/basho/riak_control
+pkg_riak_control_fetch = git
+pkg_riak_control_repo = https://github.com/basho/riak_control
+pkg_riak_control_commit = master
+
 PACKAGES += riak_core
 pkg_riak_core_name = riak_core
 pkg_riak_core_description = Distributed systems infrastructure used by Riak.
@@ -4036,7 +4044,7 @@ define dep_autopatch
 			$(call dep_autopatch2,$(1)); \
 		elif [ 0 != `grep -ci rebar $(DEPS_DIR)/$(1)/Makefile` ]; then \
 			$(call dep_autopatch2,$(1)); \
-		elif [ -n "`find $(DEPS_DIR)/$(1)/ -type f -name \*.mk -not -name erlang.mk | xargs -r grep -i rebar`" ]; then \
+		elif [ -n "`find $(DEPS_DIR)/$(1)/ -type f -name \*.mk -not -name erlang.mk -exec grep -i rebar '{}' \;`" ]; then \
 			$(call dep_autopatch2,$(1)); \
 		else \
 			if [ -f $(DEPS_DIR)/$(1)/erlang.mk ]; then \
@@ -4170,7 +4178,7 @@ define dep_autopatch_rebar.erl
 					false -> ok;
 					{Name, Source} ->
 						{Method, Repo, Commit} = case Source of
-							{hex, V} -> {hex, undefined, V};
+							{hex, V} -> {hex, V, undefined};
 							{git, R} -> {git, R, master};
 							{M, R, {branch, C}} -> {M, R, C};
 							{M, R, {ref, C}} -> {M, R, C};
@@ -4403,7 +4411,8 @@ define dep_autopatch_rebar.erl
 						end
 				end || P <- Plugins],
 				[RunPlugin(P, preprocess) || P <- Plugins],
-				[RunPlugin(P, pre_compile) || P <- Plugins]
+				[RunPlugin(P, pre_compile) || P <- Plugins],
+				[RunPlugin(P, compile) || P <- Plugins]
 		end
 	end(),
 	halt()
@@ -4441,7 +4450,25 @@ define dep_autopatch_appsrc.erl
 	halt()
 endef
 
-define hex_fetch.erl
+define dep_fetch_git
+	git clone -q -n -- $(call dep_repo,$(1)) $(DEPS_DIR)/$(call dep_name,$(1)); \
+	cd $(DEPS_DIR)/$(call dep_name,$(1)) && git checkout -q $(call dep_commit,$(1));
+endef
+
+define dep_fetch_hg
+	hg clone -q -U $(call dep_repo,$(1)) $(DEPS_DIR)/$(call dep_name,$(1)); \
+	cd $(DEPS_DIR)/$(call dep_name,$(1)) && hg update -q $(call dep_commit,$(1));
+endef
+
+define dep_fetch_svn
+	svn checkout -q $(call dep_repo,$(1)) $(DEPS_DIR)/$(call dep_name,$(1));
+endef
+
+define dep_fetch_cp
+	cp -R $(call dep_repo,$(1)) $(DEPS_DIR)/$(call dep_name,$(1));
+endef
+
+define dep_fetch_hex.erl
 	ssl:start(),
 	inets:start(),
 	{ok, {{_, 200, _}, _, Body}} = httpc:request(get,
@@ -4453,49 +4480,42 @@ define hex_fetch.erl
 	halt()
 endef
 
-define dep_fetch
-	if [ "$(2)" = "git" ]; then \
-		git clone -q -n -- $(3) $(DEPS_DIR)/$(1); \
-		cd $(DEPS_DIR)/$(1) && git checkout -q $(4); \
-	elif [ "$(2)" = "hg" ]; then \
-		hg clone -q -U $(3) $(DEPS_DIR)/$(1); \
-		cd $(DEPS_DIR)/$(1) && hg update -q $(4); \
-	elif [ "$(2)" = "svn" ]; then \
-		svn checkout -q $(3) $(DEPS_DIR)/$(1); \
-	elif [ "$(2)" = "cp" ]; then \
-		cp -R $(3) $(DEPS_DIR)/$(1); \
-	elif [ "$(2)" = "hex" ]; then \
-		$(call erlang,$(call hex_fetch.erl,$(1),$(strip $(4)))); \
-	else \
-		echo "Unknown or invalid dependency: $(1). Please consult the erlang.mk README for instructions." >&2; \
-		exit 78; \
-	fi
+# Hex only has a package version. No need to look in the Erlang.mk packages.
+define dep_fetch_hex
+	$(call erlang,$(call dep_fetch_hex.erl,$(1),$(strip $(word 2,$(dep_$(1))))));
 endef
+
+define dep_fetch_fail
+	echo "Unknown or invalid dependency: $(1). Please consult the erlang.mk README for instructions." >&2; \
+	exit 78;
+endef
+
+# Kept for compatibility purposes with older Erlang.mk configuration.
+define dep_fetch_legacy
+	$(warning WARNING: '$(1)' dependency configuration uses deprecated format.) \
+	git clone -q -n -- $(word 1,$(dep_$(1))) $(DEPS_DIR)/$(1); \
+	cd $(DEPS_DIR)/$(1) && git checkout -q $(if $(word 2,$(dep_$(1))),$(word 2,$(dep_$(1))),master);
+endef
+
+define dep_fetch
+	$(if $(dep_$(1)), \
+		$(if $(dep_fetch_$(word 1,$(dep_$(1)))), \
+			$(word 1,$(dep_$(1))), \
+			legacy), \
+		$(if $(filter $(1),$(PACKAGES)), \
+			$(pkg_$(1)_fetch), \
+			fail))
+endef
+
+dep_name = $(if $(dep_$(1)),$(1),$(pkg_$(1)_name))
+dep_repo = $(patsubst git://github.com/%,https://github.com/%, \
+	$(if $(dep_$(1)),$(word 2,$(dep_$(1))),$(pkg_$(1)_repo)))
+dep_commit = $(if $(dep_$(1)),$(word 3,$(dep_$(1))),$(pkg_$(1)_commit))
 
 define dep_target
 $(DEPS_DIR)/$(1):
 	$(verbose) mkdir -p $(DEPS_DIR)
-ifeq (,$(dep_$(1)))
-	$(dep_verbose) $(call dep_fetch,$(pkg_$(1)_name),$(pkg_$(1)_fetch), \
-		$(patsubst git://github.com/%,https://github.com/%,$(pkg_$(1)_repo)), \
-		$(pkg_$(1)_commit))
-else
-ifeq (1,$(words $(dep_$(1))))
-	$(dep_verbose) $(call dep_fetch,$(1),git, \
-		$(patsubst git://github.com/%,https://github.com/%,$(dep_$(1))), \
-		master)
-else
-ifeq (2,$(words $(dep_$(1))))
-	$(dep_verbose) $(call dep_fetch,$(1),git, \
-		$(patsubst git://github.com/%,https://github.com/%,$(word 1,$(dep_$(1)))), \
-		$(word 2,$(dep_$(1))))
-else
-	$(dep_verbose) $(call dep_fetch,$(1),$(word 1,$(dep_$(1))), \
-		$(patsubst git://github.com/%,https://github.com/%,$(word 2,$(dep_$(1)))), \
-		$(word 3,$(dep_$(1))))
-endif
-endif
-endif
+	$(dep_verbose) $(call dep_fetch_$(strip $(call dep_fetch,$(1))),$(1))
 	$(verbose) if [ -f $(DEPS_DIR)/$(1)/configure.ac -o -f $(DEPS_DIR)/$(1)/configure.in ]; then \
 		echo " AUTO  " $(1); \
 		cd $(DEPS_DIR)/$(1) && autoreconf -Wall -vif -I m4; \
@@ -4530,6 +4550,21 @@ $(foreach dep,$(DEPS),$(eval $(call dep_target,$(dep))))
 
 distclean-deps:
 	$(gen_verbose) rm -rf $(DEPS_DIR)
+
+# External plugins.
+
+DEP_PLUGINS ?=
+
+define core_dep_plugin
+-include $(DEPS_DIR)/$(1)
+
+$(DEPS_DIR)/$(1): $(DEPS_DIR)/$(2) ;
+endef
+
+$(foreach p,$(DEP_PLUGINS),\
+	$(eval $(if $(findstring /,$p),\
+		$(call core_dep_plugin,$p,$(firstword $(subst /, ,$p))),\
+		$(call core_dep_plugin,$p/plugins.mk,$p))))
 
 # Copyright (c) 2015, Loïc Hoguin <essen@ninenines.eu>
 # This file is part of erlang.mk and subject to the terms of the ISC License.
@@ -4637,7 +4672,7 @@ endif
 
 app-build: erlc-include ebin/$(PROJECT).app
 	$(eval GITDESCRIBE := $(shell git describe --dirty --abbrev=7 --tags --always --first-parent 2>/dev/null || true))
-	$(eval MODULES := $(patsubst %,'%',$(sort $(notdir $(basename $(wildcard ebin/*.beam))))))
+	$(eval MODULES := $(patsubst %,'%',$(sort $(notdir $(basename $(shell find ebin -type f -name *.beam))))))
 ifeq ($(wildcard src/$(PROJECT).app.src),)
 	$(app_verbose) echo $(subst $(newline),,$(subst ",\",$(call app_file,$(GITDESCRIBE),$(MODULES)))) \
 		> ebin/$(PROJECT).app
@@ -4658,7 +4693,7 @@ erlc-include:
 	fi
 
 define compile_erl
-	$(erlc_verbose) erlc -v $(ERLC_OPTS) -o ebin/ \
+	$(erlc_verbose) erlc -v $(if $(IS_DEP),$(filter-out -Werror,$(ERLC_OPTS)),$(ERLC_OPTS)) -o ebin/ \
 		-pa ebin/ -I include/ $(filter-out $(ERLC_EXCLUDE_PATHS),\
 		$(COMPILE_FIRST_PATHS) $(1))
 endef
@@ -4753,7 +4788,7 @@ ifneq ($(SKIP_DEPS),)
 test-deps:
 else
 test-deps: $(ALL_TEST_DEPS_DIRS)
-	$(verbose) for dep in $(ALL_TEST_DEPS_DIRS) ; do $(MAKE) -C $$dep; done
+	$(verbose) for dep in $(ALL_TEST_DEPS_DIRS) ; do $(MAKE) -C $$dep IS_DEP=1; done
 endif
 
 ifneq ($(wildcard $(TEST_DIR)),)
@@ -5365,7 +5400,9 @@ CI_OTP ?=
 ifeq ($(strip $(CI_OTP)),)
 ci::
 else
-ci:: $(KERL) $(addprefix ci-,$(CI_OTP))
+ci:: $(addprefix ci-,$(CI_OTP))
+
+ci-prepare: $(addprefix $(CI_INSTALL_DIR)/,$(CI_OTP))
 
 ci-setup::
 
@@ -5374,7 +5411,7 @@ ci_verbose = $(ci_verbose_$(V))
 
 define ci_target
 ci-$(1): $(CI_INSTALL_DIR)/$(1)
-	-$(ci_verbose) \
+	$(ci_verbose) \
 		PATH="$(CI_INSTALL_DIR)/$(1)/bin:$(PATH)" \
 		CI_OTP_RELEASE="$(1)" \
 		CT_OPTS="-label $(1)" \
@@ -5384,9 +5421,11 @@ endef
 $(foreach otp,$(CI_OTP),$(eval $(call ci_target,$(otp))))
 
 define ci_otp_target
-$(CI_INSTALL_DIR)/$(1):
+ifeq ($(wildcard $(CI_INSTALL_DIR)/$(1)),)
+$(CI_INSTALL_DIR)/$(1): $(KERL)
 	$(KERL) build git $(OTP_GIT) $(1) $(1)
 	$(KERL) install $(1) $(CI_INSTALL_DIR)/$(1)
+endif
 endef
 
 $(foreach otp,$(CI_OTP),$(eval $(call ci_otp_target,$(otp))))
@@ -5578,6 +5617,8 @@ distclean-elvis:
 # Configuration.
 
 DTL_FULL_PATH ?= 0
+DTL_PATH ?= templates/
+DTL_SUFFIX ?= _dtl
 
 # Verbosity.
 
@@ -5586,22 +5627,28 @@ dtl_verbose = $(dtl_verbose_$(V))
 
 # Core targets.
 
-define compile_erlydtl
-	$(dtl_verbose) $(ERL) -pa ebin/ $(DEPS_DIR)/erlydtl/ebin/ -eval ' \
-		Compile = fun(F) -> \
-			S = fun (1) -> re:replace(filename:rootname(string:sub_string(F, 11), ".dtl"), "/",  "_",  [{return, list}, global]); \
-				(0) -> filename:basename(F, ".dtl") \
-			end, \
-			Module = list_to_atom(string:to_lower(S($(DTL_FULL_PATH))) ++ "_dtl"), \
-			{ok, _} = erlydtl:compile(F, Module, [{out_dir, "ebin/"}, return_errors, {doc_root, "templates"}]) \
-		end, \
-		_ = [Compile(F) || F <- string:tokens("$(1)", " ")], \
-		halt().'
+define erlydtl_compile.erl
+	[begin
+		Module0 = case $(DTL_FULL_PATH) of
+			0 ->
+				filename:basename(F, ".dtl");
+			1 ->
+				"$(DTL_PATH)" ++ F2 = filename:rootname(F, ".dtl"),
+				re:replace(F2, "/",  "_",  [{return, list}, global])
+		end,
+		Module = list_to_atom(string:to_lower(Module0) ++ "$(DTL_SUFFIX)"),
+		case erlydtl:compile(F, Module, [{out_dir, "ebin/"}, return_errors, {doc_root, "templates"}]) of
+			ok -> ok;
+			{ok, _} -> ok
+		end
+	end || F <- string:tokens("$(1)", " ")],
+	halt().
 endef
 
 ifneq ($(wildcard src/),)
-ebin/$(PROJECT).app:: $(sort $(call core_find,templates/,*.dtl))
-	$(if $(strip $?),$(call compile_erlydtl,$?))
+ebin/$(PROJECT).app:: $(sort $(call core_find,$(DTL_PATH),*.dtl))
+	$(if $(strip $?),\
+		$(dtl_verbose) $(call erlang,$(call erlydtl_compile.erl,$?,-pa ebin/ $(DEPS_DIR)/erlydtl/ebin/)))
 endif
 
 # Copyright (c) 2014 Dave Cottlehuber <dch@skunkwerks.at>
@@ -5824,7 +5871,7 @@ shell: build-shell-deps
 # Copyright (c) 2015, Loïc Hoguin <essen@ninenines.eu>
 # This file is part of erlang.mk and subject to the terms of the ISC License.
 
-ifneq ($(wildcard $(DEPS_DIR)/triq),)
+ifeq ($(filter triq,$(DEPS) $(TEST_DEPS)),triq)
 .PHONY: triq
 
 # Targets.
