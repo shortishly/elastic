@@ -42,15 +42,19 @@ main(["app", "write", "increment", Component]) ->
 								 (X) ->
 								      X
 							      end, Terms)}])),
-    {ok, Configuration} = file:consult(relx_config()),
-    
-    %% write out the release configuration substituting the bumped
-    %% version for the existing.
-    %%
-    ok = file:write_file(relx_config(), ["%%-*- mode: erlang -*-",
-					 io_lib:nl(),
-					 lists:map(bump_release(stringify(NewVersion)), Configuration)]),
-    display(NewVersion).
+    case file:consult(relx_config()) of
+	{ok, Configuration} ->
+	    %% write out the release configuration substituting the bumped
+	    %% version for the existing.
+	    %%
+	    ok = file:write_file(relx_config(), ["%%-*- mode: erlang -*-",
+						 io_lib:nl(),
+						 lists:map(bump_release(stringify(NewVersion)), Configuration)]),
+	    display(NewVersion);
+		
+	{error, enoent} ->
+	    display(NewVersion)
+    end.
 
 
 bump_release(NewVersion) ->
