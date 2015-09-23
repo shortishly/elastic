@@ -16,7 +16,7 @@
 
 ERLANG_MK_FILENAME := $(realpath $(lastword $(MAKEFILE_LIST)))
 
-ERLANG_MK_VERSION = 1.2.0-631-g56cbd9e
+ERLANG_MK_VERSION = 1.2.0-649-ga0563a4
 
 # Core configuration.
 
@@ -136,7 +136,7 @@ endef
 
 # Adding erlang.mk to make Erlang scripts who call init:get_plain_arguments() happy.
 define erlang
-$(ERL) -pz $(ERLANG_MK_TMP)/rebar/ebin -eval "$(subst $(newline),,$(subst ",\",$(1)))" -- erlang.mk
+$(ERL) $(2) -pz $(ERLANG_MK_TMP)/rebar/ebin -eval "$(subst $(newline),,$(subst ",\",$(1)))" -- erlang.mk
 endef
 
 ifeq ($(shell which wget 2>/dev/null | wc -l), 1)
@@ -388,14 +388,6 @@ pkg_bootstrap_fetch = git
 pkg_bootstrap_repo = https://github.com/schlagert/bootstrap
 pkg_bootstrap_commit = master
 
-PACKAGES += boss_db
-pkg_boss_db_name = boss_db
-pkg_boss_db_description = BossDB: a sharded, caching, pooling, evented ORM for Erlang
-pkg_boss_db_homepage = https://github.com/ErlyORM/boss_db
-pkg_boss_db_fetch = git
-pkg_boss_db_repo = https://github.com/ErlyORM/boss_db
-pkg_boss_db_commit = master
-
 PACKAGES += boss
 pkg_boss_name = boss
 pkg_boss_description = Erlang web MVC, now featuring Comet
@@ -403,6 +395,14 @@ pkg_boss_homepage = https://github.com/ChicagoBoss/ChicagoBoss
 pkg_boss_fetch = git
 pkg_boss_repo = https://github.com/ChicagoBoss/ChicagoBoss
 pkg_boss_commit = master
+
+PACKAGES += boss_db
+pkg_boss_db_name = boss_db
+pkg_boss_db_description = BossDB: a sharded, caching, pooling, evented ORM for Erlang
+pkg_boss_db_homepage = https://github.com/ErlyORM/boss_db
+pkg_boss_db_fetch = git
+pkg_boss_db_repo = https://github.com/ErlyORM/boss_db
+pkg_boss_db_commit = master
 
 PACKAGES += bson
 pkg_bson_name = bson
@@ -492,6 +492,14 @@ pkg_chronos_fetch = git
 pkg_chronos_repo = https://github.com/lehoff/chronos
 pkg_chronos_commit = master
 
+PACKAGES += cl
+pkg_cl_name = cl
+pkg_cl_description = OpenCL binding for Erlang
+pkg_cl_homepage = https://github.com/tonyrog/cl
+pkg_cl_fetch = git
+pkg_cl_repo = https://github.com/tonyrog/cl
+pkg_cl_commit = master
+
 PACKAGES += classifier
 pkg_classifier_name = classifier
 pkg_classifier_description = An Erlang Bayesian Filter and Text Classifier
@@ -507,14 +515,6 @@ pkg_clique_homepage = https://github.com/basho/clique
 pkg_clique_fetch = git
 pkg_clique_repo = https://github.com/basho/clique
 pkg_clique_commit = develop
-
-PACKAGES += cl
-pkg_cl_name = cl
-pkg_cl_description = OpenCL binding for Erlang
-pkg_cl_homepage = https://github.com/tonyrog/cl
-pkg_cl_fetch = git
-pkg_cl_repo = https://github.com/tonyrog/cl
-pkg_cl_commit = master
 
 PACKAGES += cloudi_core
 pkg_cloudi_core_name = cloudi_core
@@ -532,13 +532,13 @@ pkg_cloudi_service_api_requests_fetch = git
 pkg_cloudi_service_api_requests_repo = https://github.com/CloudI/cloudi_service_api_requests
 pkg_cloudi_service_api_requests_commit = master
 
-PACKAGES += cloudi_service_db_cassandra_cql
-pkg_cloudi_service_db_cassandra_cql_name = cloudi_service_db_cassandra_cql
-pkg_cloudi_service_db_cassandra_cql_description = Cassandra CQL CloudI Service
-pkg_cloudi_service_db_cassandra_cql_homepage = http://cloudi.org/
-pkg_cloudi_service_db_cassandra_cql_fetch = git
-pkg_cloudi_service_db_cassandra_cql_repo = https://github.com/CloudI/cloudi_service_db_cassandra_cql
-pkg_cloudi_service_db_cassandra_cql_commit = master
+PACKAGES += cloudi_service_db
+pkg_cloudi_service_db_name = cloudi_service_db
+pkg_cloudi_service_db_description = CloudI Database (in-memory/testing/generic)
+pkg_cloudi_service_db_homepage = http://cloudi.org/
+pkg_cloudi_service_db_fetch = git
+pkg_cloudi_service_db_repo = https://github.com/CloudI/cloudi_service_db
+pkg_cloudi_service_db_commit = master
 
 PACKAGES += cloudi_service_db_cassandra
 pkg_cloudi_service_db_cassandra_name = cloudi_service_db_cassandra
@@ -547,6 +547,14 @@ pkg_cloudi_service_db_cassandra_homepage = http://cloudi.org/
 pkg_cloudi_service_db_cassandra_fetch = git
 pkg_cloudi_service_db_cassandra_repo = https://github.com/CloudI/cloudi_service_db_cassandra
 pkg_cloudi_service_db_cassandra_commit = master
+
+PACKAGES += cloudi_service_db_cassandra_cql
+pkg_cloudi_service_db_cassandra_cql_name = cloudi_service_db_cassandra_cql
+pkg_cloudi_service_db_cassandra_cql_description = Cassandra CQL CloudI Service
+pkg_cloudi_service_db_cassandra_cql_homepage = http://cloudi.org/
+pkg_cloudi_service_db_cassandra_cql_fetch = git
+pkg_cloudi_service_db_cassandra_cql_repo = https://github.com/CloudI/cloudi_service_db_cassandra_cql
+pkg_cloudi_service_db_cassandra_cql_commit = master
 
 PACKAGES += cloudi_service_db_couchdb
 pkg_cloudi_service_db_couchdb_name = cloudi_service_db_couchdb
@@ -571,14 +579,6 @@ pkg_cloudi_service_db_memcached_homepage = http://cloudi.org/
 pkg_cloudi_service_db_memcached_fetch = git
 pkg_cloudi_service_db_memcached_repo = https://github.com/CloudI/cloudi_service_db_memcached
 pkg_cloudi_service_db_memcached_commit = master
-
-PACKAGES += cloudi_service_db
-pkg_cloudi_service_db_name = cloudi_service_db
-pkg_cloudi_service_db_description = CloudI Database (in-memory/testing/generic)
-pkg_cloudi_service_db_homepage = http://cloudi.org/
-pkg_cloudi_service_db_fetch = git
-pkg_cloudi_service_db_repo = https://github.com/CloudI/cloudi_service_db
-pkg_cloudi_service_db_commit = master
 
 PACKAGES += cloudi_service_db_mysql
 pkg_cloudi_service_db_mysql_name = cloudi_service_db_mysql
@@ -748,14 +748,6 @@ pkg_confetti_fetch = git
 pkg_confetti_repo = https://github.com/jtendo/confetti
 pkg_confetti_commit = master
 
-PACKAGES += couchbeam
-pkg_couchbeam_name = couchbeam
-pkg_couchbeam_description = Apache CouchDB client in Erlang
-pkg_couchbeam_homepage = https://github.com/benoitc/couchbeam
-pkg_couchbeam_fetch = git
-pkg_couchbeam_repo = https://github.com/benoitc/couchbeam
-pkg_couchbeam_commit = master
-
 PACKAGES += couch
 pkg_couch_name = couch
 pkg_couch_description = A embeddable document oriented database compatible with Apache CouchDB
@@ -763,6 +755,14 @@ pkg_couch_homepage = https://github.com/benoitc/opencouch
 pkg_couch_fetch = git
 pkg_couch_repo = https://github.com/benoitc/opencouch
 pkg_couch_commit = master
+
+PACKAGES += couchbeam
+pkg_couchbeam_name = couchbeam
+pkg_couchbeam_description = Apache CouchDB client in Erlang
+pkg_couchbeam_homepage = https://github.com/benoitc/couchbeam
+pkg_couchbeam_fetch = git
+pkg_couchbeam_repo = https://github.com/benoitc/couchbeam
+pkg_couchbeam_commit = master
 
 PACKAGES += covertool
 pkg_covertool_name = covertool
@@ -1020,14 +1020,6 @@ pkg_edown_fetch = git
 pkg_edown_repo = https://github.com/uwiger/edown
 pkg_edown_commit = master
 
-PACKAGES += eep_app
-pkg_eep_app_name = eep_app
-pkg_eep_app_description = Embedded Event Processing
-pkg_eep_app_homepage = https://github.com/darach/eep-erl
-pkg_eep_app_fetch = git
-pkg_eep_app_repo = https://github.com/darach/eep-erl
-pkg_eep_app_commit = master
-
 PACKAGES += eep
 pkg_eep_name = eep
 pkg_eep_description = Erlang Easy Profiling (eep) application provides a way to analyze application performance and call hierarchy
@@ -1035,6 +1027,14 @@ pkg_eep_homepage = https://github.com/virtan/eep
 pkg_eep_fetch = git
 pkg_eep_repo = https://github.com/virtan/eep
 pkg_eep_commit = master
+
+PACKAGES += eep_app
+pkg_eep_app_name = eep_app
+pkg_eep_app_description = Embedded Event Processing
+pkg_eep_app_homepage = https://github.com/darach/eep-erl
+pkg_eep_app_fetch = git
+pkg_eep_app_repo = https://github.com/darach/eep-erl
+pkg_eep_app_commit = master
 
 PACKAGES += efene
 pkg_efene_name = efene
@@ -1068,14 +1068,6 @@ pkg_ehsa_fetch = hg
 pkg_ehsa_repo = https://bitbucket.org/a12n/ehsa
 pkg_ehsa_commit = 2.0.4
 
-PACKAGES += ejabberd
-pkg_ejabberd_name = ejabberd
-pkg_ejabberd_description = Robust, ubiquitous and massively scalable Jabber / XMPP Instant Messaging platform
-pkg_ejabberd_homepage = https://github.com/processone/ejabberd
-pkg_ejabberd_fetch = git
-pkg_ejabberd_repo = https://github.com/processone/ejabberd
-pkg_ejabberd_commit = master
-
 PACKAGES += ej
 pkg_ej_name = ej
 pkg_ej_description = Helper module for working with Erlang terms representing JSON
@@ -1083,6 +1075,14 @@ pkg_ej_homepage = https://github.com/seth/ej
 pkg_ej_fetch = git
 pkg_ej_repo = https://github.com/seth/ej
 pkg_ej_commit = master
+
+PACKAGES += ejabberd
+pkg_ejabberd_name = ejabberd
+pkg_ejabberd_description = Robust, ubiquitous and massively scalable Jabber / XMPP Instant Messaging platform
+pkg_ejabberd_homepage = https://github.com/processone/ejabberd
+pkg_ejabberd_fetch = git
+pkg_ejabberd_repo = https://github.com/processone/ejabberd
+pkg_ejabberd_commit = master
 
 PACKAGES += ejwt
 pkg_ejwt_name = ejwt
@@ -1243,6 +1243,14 @@ pkg_eredis_pool_homepage = https://github.com/hiroeorz/eredis_pool
 pkg_eredis_pool_fetch = git
 pkg_eredis_pool_repo = https://github.com/hiroeorz/eredis_pool
 pkg_eredis_pool_commit = master
+
+PACKAGES += erl_streams
+pkg_erl_streams_name = erl_streams
+pkg_erl_streams_description = Streams in Erlang
+pkg_erl_streams_homepage = https://github.com/epappas/erl_streams
+pkg_erl_streams_fetch = git
+pkg_erl_streams_repo = https://github.com/epappas/erl_streams
+pkg_erl_streams_commit = master
 
 PACKAGES += erlang_cep
 pkg_erlang_cep_name = erlang_cep
@@ -1420,14 +1428,6 @@ pkg_erlport_fetch = git
 pkg_erlport_repo = https://github.com/hdima/erlport
 pkg_erlport_commit = master
 
-PACKAGES += erlsha2
-pkg_erlsha2_name = erlsha2
-pkg_erlsha2_description = SHA-224, SHA-256, SHA-384, SHA-512 implemented in Erlang NIFs.
-pkg_erlsha2_homepage = https://github.com/vinoski/erlsha2
-pkg_erlsha2_fetch = git
-pkg_erlsha2_repo = https://github.com/vinoski/erlsha2
-pkg_erlsha2_commit = master
-
 PACKAGES += erlsh
 pkg_erlsh_name = erlsh
 pkg_erlsh_description = Erlang shell tools
@@ -1436,6 +1436,14 @@ pkg_erlsh_fetch = git
 pkg_erlsh_repo = https://github.com/proger/erlsh
 pkg_erlsh_commit = master
 
+PACKAGES += erlsha2
+pkg_erlsha2_name = erlsha2
+pkg_erlsha2_description = SHA-224, SHA-256, SHA-384, SHA-512 implemented in Erlang NIFs.
+pkg_erlsha2_homepage = https://github.com/vinoski/erlsha2
+pkg_erlsha2_fetch = git
+pkg_erlsha2_repo = https://github.com/vinoski/erlsha2
+pkg_erlsha2_commit = master
+
 PACKAGES += erlsom
 pkg_erlsom_name = erlsom
 pkg_erlsom_description = XML parser for Erlang
@@ -1443,14 +1451,6 @@ pkg_erlsom_homepage = https://github.com/willemdj/erlsom
 pkg_erlsom_fetch = git
 pkg_erlsom_repo = https://github.com/willemdj/erlsom
 pkg_erlsom_commit = master
-
-PACKAGES += erl_streams
-pkg_erl_streams_name = erl_streams
-pkg_erl_streams_description = Streams in Erlang
-pkg_erl_streams_homepage = https://github.com/epappas/erl_streams
-pkg_erl_streams_fetch = git
-pkg_erl_streams_repo = https://github.com/epappas/erl_streams
-pkg_erl_streams_commit = master
 
 PACKAGES += erlubi
 pkg_erlubi_name = erlubi
@@ -1532,14 +1532,6 @@ pkg_etap_fetch = git
 pkg_etap_repo = https://github.com/ngerakines/etap
 pkg_etap_commit = master
 
-PACKAGES += etest_http
-pkg_etest_http_name = etest_http
-pkg_etest_http_description = etest Assertions around HTTP (client-side)
-pkg_etest_http_homepage = https://github.com/wooga/etest_http
-pkg_etest_http_fetch = git
-pkg_etest_http_repo = https://github.com/wooga/etest_http
-pkg_etest_http_commit = master
-
 PACKAGES += etest
 pkg_etest_name = etest
 pkg_etest_description = A lightweight, convention over configuration test framework for Erlang
@@ -1547,6 +1539,14 @@ pkg_etest_homepage = https://github.com/wooga/etest
 pkg_etest_fetch = git
 pkg_etest_repo = https://github.com/wooga/etest
 pkg_etest_commit = master
+
+PACKAGES += etest_http
+pkg_etest_http_name = etest_http
+pkg_etest_http_description = etest Assertions around HTTP (client-side)
+pkg_etest_http_homepage = https://github.com/wooga/etest_http
+pkg_etest_http_fetch = git
+pkg_etest_http_repo = https://github.com/wooga/etest_http
+pkg_etest_http_commit = master
 
 PACKAGES += etoml
 pkg_etoml_name = etoml
@@ -1556,14 +1556,6 @@ pkg_etoml_fetch = git
 pkg_etoml_repo = https://github.com/kalta/etoml
 pkg_etoml_commit = master
 
-PACKAGES += eunit_formatters
-pkg_eunit_formatters_name = eunit_formatters
-pkg_eunit_formatters_description = Because eunit's output sucks. Let's make it better.
-pkg_eunit_formatters_homepage = https://github.com/seancribbs/eunit_formatters
-pkg_eunit_formatters_fetch = git
-pkg_eunit_formatters_repo = https://github.com/seancribbs/eunit_formatters
-pkg_eunit_formatters_commit = master
-
 PACKAGES += eunit
 pkg_eunit_name = eunit
 pkg_eunit_description = The EUnit lightweight unit testing framework for Erlang - this is the canonical development repository.
@@ -1571,6 +1563,14 @@ pkg_eunit_homepage = https://github.com/richcarl/eunit
 pkg_eunit_fetch = git
 pkg_eunit_repo = https://github.com/richcarl/eunit
 pkg_eunit_commit = master
+
+PACKAGES += eunit_formatters
+pkg_eunit_formatters_name = eunit_formatters
+pkg_eunit_formatters_description = Because eunit's output sucks. Let's make it better.
+pkg_eunit_formatters_homepage = https://github.com/seancribbs/eunit_formatters
+pkg_eunit_formatters_fetch = git
+pkg_eunit_formatters_repo = https://github.com/seancribbs/eunit_formatters
+pkg_eunit_formatters_commit = master
 
 PACKAGES += euthanasia
 pkg_euthanasia_name = euthanasia
@@ -1700,6 +1700,14 @@ pkg_fn_fetch = git
 pkg_fn_repo = https://github.com/reiddraper/fn
 pkg_fn_commit = master
 
+PACKAGES += folsom
+pkg_folsom_name = folsom
+pkg_folsom_description = Expose Erlang Events and Metrics
+pkg_folsom_homepage = https://github.com/boundary/folsom
+pkg_folsom_fetch = git
+pkg_folsom_repo = https://github.com/boundary/folsom
+pkg_folsom_commit = master
+
 PACKAGES += folsom_cowboy
 pkg_folsom_cowboy_name = folsom_cowboy
 pkg_folsom_cowboy_description = A Cowboy based Folsom HTTP Wrapper.
@@ -1715,14 +1723,6 @@ pkg_folsomite_homepage = https://github.com/campanja/folsomite
 pkg_folsomite_fetch = git
 pkg_folsomite_repo = https://github.com/campanja/folsomite
 pkg_folsomite_commit = master
-
-PACKAGES += folsom
-pkg_folsom_name = folsom
-pkg_folsom_description = Expose Erlang Events and Metrics
-pkg_folsom_homepage = https://github.com/boundary/folsom
-pkg_folsom_fetch = git
-pkg_folsom_repo = https://github.com/boundary/folsom
-pkg_folsom_commit = master
 
 PACKAGES += fs
 pkg_fs_name = fs
@@ -1996,14 +1996,6 @@ pkg_iota_fetch = git
 pkg_iota_repo = https://github.com/jpgneves/iota
 pkg_iota_commit = master
 
-PACKAGES += ircd
-pkg_ircd_name = ircd
-pkg_ircd_description = A pluggable IRC daemon application/library for Erlang.
-pkg_ircd_homepage = https://github.com/tonyg/erlang-ircd
-pkg_ircd_fetch = git
-pkg_ircd_repo = https://github.com/tonyg/erlang-ircd
-pkg_ircd_commit = master
-
 PACKAGES += irc_lib
 pkg_irc_lib_name = irc_lib
 pkg_irc_lib_description = Erlang irc client library
@@ -2011,6 +2003,14 @@ pkg_irc_lib_homepage = https://github.com/OtpChatBot/irc_lib
 pkg_irc_lib_fetch = git
 pkg_irc_lib_repo = https://github.com/OtpChatBot/irc_lib
 pkg_irc_lib_commit = master
+
+PACKAGES += ircd
+pkg_ircd_name = ircd
+pkg_ircd_description = A pluggable IRC daemon application/library for Erlang.
+pkg_ircd_homepage = https://github.com/tonyg/erlang-ircd
+pkg_ircd_fetch = git
+pkg_ircd_repo = https://github.com/tonyg/erlang-ircd
+pkg_ircd_commit = master
 
 PACKAGES += iris
 pkg_iris_name = iris
@@ -2084,14 +2084,6 @@ pkg_joxa_fetch = git
 pkg_joxa_repo = https://github.com/joxa/joxa
 pkg_joxa_commit = master
 
-PACKAGES += jsonerl
-pkg_jsonerl_name = jsonerl
-pkg_jsonerl_description = yet another but slightly different erlang <-> json encoder/decoder
-pkg_jsonerl_homepage = https://github.com/lambder/jsonerl
-pkg_jsonerl_fetch = git
-pkg_jsonerl_repo = https://github.com/lambder/jsonerl
-pkg_jsonerl_commit = master
-
 PACKAGES += json
 pkg_json_name = json
 pkg_json_description = a high level json library for erlang (17.0+)
@@ -2100,14 +2092,6 @@ pkg_json_fetch = git
 pkg_json_repo = https://github.com/talentdeficit/json
 pkg_json_commit = master
 
-PACKAGES += jsonpath
-pkg_jsonpath_name = jsonpath
-pkg_jsonpath_description = Fast Erlang JSON data retrieval and updates via javascript-like notation
-pkg_jsonpath_homepage = https://github.com/GeneStevens/jsonpath
-pkg_jsonpath_fetch = git
-pkg_jsonpath_repo = https://github.com/GeneStevens/jsonpath
-pkg_jsonpath_commit = master
-
 PACKAGES += json_rec
 pkg_json_rec_name = json_rec
 pkg_json_rec_description = JSON to erlang record
@@ -2115,6 +2099,22 @@ pkg_json_rec_homepage = https://github.com/justinkirby/json_rec
 pkg_json_rec_fetch = git
 pkg_json_rec_repo = https://github.com/justinkirby/json_rec
 pkg_json_rec_commit = master
+
+PACKAGES += jsonerl
+pkg_jsonerl_name = jsonerl
+pkg_jsonerl_description = yet another but slightly different erlang <-> json encoder/decoder
+pkg_jsonerl_homepage = https://github.com/lambder/jsonerl
+pkg_jsonerl_fetch = git
+pkg_jsonerl_repo = https://github.com/lambder/jsonerl
+pkg_jsonerl_commit = master
+
+PACKAGES += jsonpath
+pkg_jsonpath_name = jsonpath
+pkg_jsonpath_description = Fast Erlang JSON data retrieval and updates via javascript-like notation
+pkg_jsonpath_homepage = https://github.com/GeneStevens/jsonpath
+pkg_jsonpath_fetch = git
+pkg_jsonpath_repo = https://github.com/GeneStevens/jsonpath
+pkg_jsonpath_commit = master
 
 PACKAGES += jsonx
 pkg_jsonx_name = jsonx
@@ -2236,14 +2236,6 @@ pkg_kvs_fetch = git
 pkg_kvs_repo = https://github.com/synrc/kvs
 pkg_kvs_commit = master
 
-PACKAGES += lager_amqp_backend
-pkg_lager_amqp_backend_name = lager_amqp_backend
-pkg_lager_amqp_backend_description = AMQP RabbitMQ Lager backend
-pkg_lager_amqp_backend_homepage = https://github.com/jbrisbin/lager_amqp_backend
-pkg_lager_amqp_backend_fetch = git
-pkg_lager_amqp_backend_repo = https://github.com/jbrisbin/lager_amqp_backend
-pkg_lager_amqp_backend_commit = master
-
 PACKAGES += lager
 pkg_lager_name = lager
 pkg_lager_description = A logging framework for Erlang/OTP.
@@ -2251,6 +2243,14 @@ pkg_lager_homepage = https://github.com/basho/lager
 pkg_lager_fetch = git
 pkg_lager_repo = https://github.com/basho/lager
 pkg_lager_commit = master
+
+PACKAGES += lager_amqp_backend
+pkg_lager_amqp_backend_name = lager_amqp_backend
+pkg_lager_amqp_backend_description = AMQP RabbitMQ Lager backend
+pkg_lager_amqp_backend_homepage = https://github.com/jbrisbin/lager_amqp_backend
+pkg_lager_amqp_backend_fetch = git
+pkg_lager_amqp_backend_repo = https://github.com/jbrisbin/lager_amqp_backend
+pkg_lager_amqp_backend_commit = master
 
 PACKAGES += lager_syslog
 pkg_lager_syslog_name = lager_syslog
@@ -2428,6 +2428,14 @@ pkg_mavg_fetch = git
 pkg_mavg_repo = https://github.com/EchoTeam/mavg
 pkg_mavg_commit = master
 
+PACKAGES += mc_erl
+pkg_mc_erl_name = mc_erl
+pkg_mc_erl_description = mc-erl is a server for Minecraft 1.4.7 written in Erlang.
+pkg_mc_erl_homepage = https://github.com/clonejo/mc-erl
+pkg_mc_erl_fetch = git
+pkg_mc_erl_repo = https://github.com/clonejo/mc-erl
+pkg_mc_erl_commit = master
+
 PACKAGES += mcd
 pkg_mcd_name = mcd
 pkg_mcd_description = Fast memcached protocol client in pure Erlang
@@ -2443,14 +2451,6 @@ pkg_mcerlang_homepage = https://github.com/fredlund/McErlang
 pkg_mcerlang_fetch = git
 pkg_mcerlang_repo = https://github.com/fredlund/McErlang
 pkg_mcerlang_commit = master
-
-PACKAGES += mc_erl
-pkg_mc_erl_name = mc_erl
-pkg_mc_erl_description = mc-erl is a server for Minecraft 1.4.7 written in Erlang.
-pkg_mc_erl_homepage = https://github.com/clonejo/mc-erl
-pkg_mc_erl_fetch = git
-pkg_mc_erl_repo = https://github.com/clonejo/mc-erl
-pkg_mc_erl_commit = master
 
 PACKAGES += meck
 pkg_meck_name = meck
@@ -2700,13 +2700,13 @@ pkg_nprocreg_fetch = git
 pkg_nprocreg_repo = https://github.com/nitrogen/nprocreg
 pkg_nprocreg_commit = master
 
-PACKAGES += oauth2c
-pkg_oauth2c_name = oauth2c
-pkg_oauth2c_description = Erlang OAuth2 Client
-pkg_oauth2c_homepage = https://github.com/kivra/oauth2_client
-pkg_oauth2c_fetch = git
-pkg_oauth2c_repo = https://github.com/kivra/oauth2_client
-pkg_oauth2c_commit = master
+PACKAGES += oauth
+pkg_oauth_name = oauth
+pkg_oauth_description = An Erlang OAuth 1.0 implementation
+pkg_oauth_homepage = https://github.com/tim/erlang-oauth
+pkg_oauth_fetch = git
+pkg_oauth_repo = https://github.com/tim/erlang-oauth
+pkg_oauth_commit = master
 
 PACKAGES += oauth2
 pkg_oauth2_name = oauth2
@@ -2716,13 +2716,13 @@ pkg_oauth2_fetch = git
 pkg_oauth2_repo = https://github.com/kivra/oauth2
 pkg_oauth2_commit = master
 
-PACKAGES += oauth
-pkg_oauth_name = oauth
-pkg_oauth_description = An Erlang OAuth 1.0 implementation
-pkg_oauth_homepage = https://github.com/tim/erlang-oauth
-pkg_oauth_fetch = git
-pkg_oauth_repo = https://github.com/tim/erlang-oauth
-pkg_oauth_commit = master
+PACKAGES += oauth2c
+pkg_oauth2c_name = oauth2c
+pkg_oauth2c_description = Erlang OAuth2 Client
+pkg_oauth2c_homepage = https://github.com/kivra/oauth2_client
+pkg_oauth2c_fetch = git
+pkg_oauth2c_repo = https://github.com/kivra/oauth2_client
+pkg_oauth2c_commit = master
 
 PACKAGES += of_protocol
 pkg_of_protocol_name = of_protocol
@@ -2892,14 +2892,6 @@ pkg_procket_fetch = git
 pkg_procket_repo = https://github.com/msantos/procket
 pkg_procket_commit = master
 
-PACKAGES += proper
-pkg_proper_name = proper
-pkg_proper_description = PropEr: a QuickCheck-inspired property-based testing tool for Erlang.
-pkg_proper_homepage = http://proper.softlab.ntua.gr
-pkg_proper_fetch = git
-pkg_proper_repo = https://github.com/manopapad/proper
-pkg_proper_commit = master
-
 PACKAGES += prop
 pkg_prop_name = prop
 pkg_prop_description = An Erlang code scaffolding and generator system.
@@ -2907,6 +2899,14 @@ pkg_prop_homepage = https://github.com/nuex/prop
 pkg_prop_fetch = git
 pkg_prop_repo = https://github.com/nuex/prop
 pkg_prop_commit = master
+
+PACKAGES += proper
+pkg_proper_name = proper
+pkg_proper_description = PropEr: a QuickCheck-inspired property-based testing tool for Erlang.
+pkg_proper_homepage = http://proper.softlab.ntua.gr
+pkg_proper_fetch = git
+pkg_proper_repo = https://github.com/manopapad/proper
+pkg_proper_commit = master
 
 PACKAGES += props
 pkg_props_name = props
@@ -2988,14 +2988,6 @@ pkg_quickrand_fetch = git
 pkg_quickrand_repo = https://github.com/okeuday/quickrand
 pkg_quickrand_commit = master
 
-PACKAGES += rabbit_exchange_type_riak
-pkg_rabbit_exchange_type_riak_name = rabbit_exchange_type_riak
-pkg_rabbit_exchange_type_riak_description = Custom RabbitMQ exchange type for sticking messages in Riak
-pkg_rabbit_exchange_type_riak_homepage = https://github.com/jbrisbin/riak-exchange
-pkg_rabbit_exchange_type_riak_fetch = git
-pkg_rabbit_exchange_type_riak_repo = https://github.com/jbrisbin/riak-exchange
-pkg_rabbit_exchange_type_riak_commit = master
-
 PACKAGES += rabbit
 pkg_rabbit_name = rabbit
 pkg_rabbit_description = RabbitMQ Server
@@ -3003,6 +2995,14 @@ pkg_rabbit_homepage = https://www.rabbitmq.com/
 pkg_rabbit_fetch = git
 pkg_rabbit_repo = https://github.com/rabbitmq/rabbitmq-server.git
 pkg_rabbit_commit = master
+
+PACKAGES += rabbit_exchange_type_riak
+pkg_rabbit_exchange_type_riak_name = rabbit_exchange_type_riak
+pkg_rabbit_exchange_type_riak_description = Custom RabbitMQ exchange type for sticking messages in Riak
+pkg_rabbit_exchange_type_riak_homepage = https://github.com/jbrisbin/riak-exchange
+pkg_rabbit_exchange_type_riak_fetch = git
+pkg_rabbit_exchange_type_riak_repo = https://github.com/jbrisbin/riak-exchange
+pkg_rabbit_exchange_type_riak_commit = master
 
 PACKAGES += rack
 pkg_rack_name = rack
@@ -3140,13 +3140,13 @@ pkg_rfc4627_jsonrpc_fetch = git
 pkg_rfc4627_jsonrpc_repo = https://github.com/tonyg/erlang-rfc4627
 pkg_rfc4627_jsonrpc_commit = master
 
-PACKAGES += riakc
-pkg_riakc_name = riakc
-pkg_riakc_description = Erlang clients for Riak.
-pkg_riakc_homepage = https://github.com/basho/riak-erlang-client
-pkg_riakc_fetch = git
-pkg_riakc_repo = https://github.com/basho/riak-erlang-client
-pkg_riakc_commit = master
+PACKAGES += riak_control
+pkg_riak_control_name = riak_control
+pkg_riak_control_description = Webmachine-based administration interface for Riak.
+pkg_riak_control_homepage = https://github.com/basho/riak_control
+pkg_riak_control_fetch = git
+pkg_riak_control_repo = https://github.com/basho/riak_control
+pkg_riak_control_commit = master
 
 PACKAGES += riak_core
 pkg_riak_core_name = riak_core
@@ -3172,14 +3172,6 @@ pkg_riak_ensemble_fetch = git
 pkg_riak_ensemble_repo = https://github.com/basho/riak_ensemble
 pkg_riak_ensemble_commit = master
 
-PACKAGES += riakhttpc
-pkg_riakhttpc_name = riakhttpc
-pkg_riakhttpc_description = Riak Erlang client using the HTTP interface
-pkg_riakhttpc_homepage = https://github.com/basho/riak-erlang-http-client
-pkg_riakhttpc_fetch = git
-pkg_riakhttpc_repo = https://github.com/basho/riak-erlang-http-client
-pkg_riakhttpc_commit = master
-
 PACKAGES += riak_kv
 pkg_riak_kv_name = riak_kv
 pkg_riak_kv_description = Riak Key/Value Store
@@ -3187,14 +3179,6 @@ pkg_riak_kv_homepage = https://github.com/basho/riak_kv
 pkg_riak_kv_fetch = git
 pkg_riak_kv_repo = https://github.com/basho/riak_kv
 pkg_riak_kv_commit = master
-
-PACKAGES += riaknostic
-pkg_riaknostic_name = riaknostic
-pkg_riaknostic_description = A diagnostic tool for Riak installations, to find common errors asap
-pkg_riaknostic_homepage = https://github.com/basho/riaknostic
-pkg_riaknostic_fetch = git
-pkg_riaknostic_repo = https://github.com/basho/riaknostic
-pkg_riaknostic_commit = master
 
 PACKAGES += riak_pg
 pkg_riak_pg_name = riak_pg
@@ -3212,14 +3196,6 @@ pkg_riak_pipe_fetch = git
 pkg_riak_pipe_repo = https://github.com/basho/riak_pipe
 pkg_riak_pipe_commit = master
 
-PACKAGES += riakpool
-pkg_riakpool_name = riakpool
-pkg_riakpool_description = erlang riak client pool
-pkg_riakpool_homepage = https://github.com/dweldon/riakpool
-pkg_riakpool_fetch = git
-pkg_riakpool_repo = https://github.com/dweldon/riakpool
-pkg_riakpool_commit = master
-
 PACKAGES += riak_sysmon
 pkg_riak_sysmon_name = riak_sysmon
 pkg_riak_sysmon_description = Simple OTP app for managing Erlang VM system_monitor event messages
@@ -3235,6 +3211,38 @@ pkg_riak_test_homepage = https://github.com/basho/riak_test
 pkg_riak_test_fetch = git
 pkg_riak_test_repo = https://github.com/basho/riak_test
 pkg_riak_test_commit = master
+
+PACKAGES += riakc
+pkg_riakc_name = riakc
+pkg_riakc_description = Erlang clients for Riak.
+pkg_riakc_homepage = https://github.com/basho/riak-erlang-client
+pkg_riakc_fetch = git
+pkg_riakc_repo = https://github.com/basho/riak-erlang-client
+pkg_riakc_commit = master
+
+PACKAGES += riakhttpc
+pkg_riakhttpc_name = riakhttpc
+pkg_riakhttpc_description = Riak Erlang client using the HTTP interface
+pkg_riakhttpc_homepage = https://github.com/basho/riak-erlang-http-client
+pkg_riakhttpc_fetch = git
+pkg_riakhttpc_repo = https://github.com/basho/riak-erlang-http-client
+pkg_riakhttpc_commit = master
+
+PACKAGES += riaknostic
+pkg_riaknostic_name = riaknostic
+pkg_riaknostic_description = A diagnostic tool for Riak installations, to find common errors asap
+pkg_riaknostic_homepage = https://github.com/basho/riaknostic
+pkg_riaknostic_fetch = git
+pkg_riaknostic_repo = https://github.com/basho/riaknostic
+pkg_riaknostic_commit = master
+
+PACKAGES += riakpool
+pkg_riakpool_name = riakpool
+pkg_riakpool_description = erlang riak client pool
+pkg_riakpool_homepage = https://github.com/dweldon/riakpool
+pkg_riakpool_fetch = git
+pkg_riakpool_repo = https://github.com/dweldon/riakpool
+pkg_riakpool_commit = master
 
 PACKAGES += rivus_cep
 pkg_rivus_cep_name = rivus_cep
@@ -3524,14 +3532,6 @@ pkg_switchboard_fetch = git
 pkg_switchboard_repo = https://github.com/thusfresh/switchboard
 pkg_switchboard_commit = master
 
-PACKAGES += sync
-pkg_sync_name = sync
-pkg_sync_description = On-the-fly recompiling and reloading in Erlang.
-pkg_sync_homepage = https://github.com/rustyio/sync
-pkg_sync_fetch = git
-pkg_sync_repo = https://github.com/rustyio/sync
-pkg_sync_commit = master
-
 PACKAGES += syn
 pkg_syn_name = syn
 pkg_syn_description = A global process registry for Erlang.
@@ -3539,6 +3539,14 @@ pkg_syn_homepage = https://github.com/ostinelli/syn
 pkg_syn_fetch = git
 pkg_syn_repo = https://github.com/ostinelli/syn
 pkg_syn_commit = master
+
+PACKAGES += sync
+pkg_sync_name = sync
+pkg_sync_description = On-the-fly recompiling and reloading in Erlang.
+pkg_sync_homepage = https://github.com/rustyio/sync
+pkg_sync_fetch = git
+pkg_sync_repo = https://github.com/rustyio/sync
+pkg_sync_commit = master
 
 PACKAGES += syntaxerl
 pkg_syntaxerl_name = syntaxerl
@@ -4036,7 +4044,7 @@ define dep_autopatch
 			$(call dep_autopatch2,$(1)); \
 		elif [ 0 != `grep -ci rebar $(DEPS_DIR)/$(1)/Makefile` ]; then \
 			$(call dep_autopatch2,$(1)); \
-		elif [ -n "`find $(DEPS_DIR)/$(1)/ -type f -name \*.mk -not -name erlang.mk | xargs -r grep -i rebar`" ]; then \
+		elif [ -n "`find $(DEPS_DIR)/$(1)/ -type f -name \*.mk -not -name erlang.mk -exec grep -i rebar '{}' \;`" ]; then \
 			$(call dep_autopatch2,$(1)); \
 		else \
 			if [ -f $(DEPS_DIR)/$(1)/erlang.mk ]; then \
@@ -4170,7 +4178,7 @@ define dep_autopatch_rebar.erl
 					false -> ok;
 					{Name, Source} ->
 						{Method, Repo, Commit} = case Source of
-							{hex, V} -> {hex, undefined, V};
+							{hex, V} -> {hex, V, undefined};
 							{git, R} -> {git, R, master};
 							{M, R, {branch, C}} -> {M, R, C};
 							{M, R, {ref, C}} -> {M, R, C};
@@ -4403,7 +4411,8 @@ define dep_autopatch_rebar.erl
 						end
 				end || P <- Plugins],
 				[RunPlugin(P, preprocess) || P <- Plugins],
-				[RunPlugin(P, pre_compile) || P <- Plugins]
+				[RunPlugin(P, pre_compile) || P <- Plugins],
+				[RunPlugin(P, compile) || P <- Plugins]
 		end
 	end(),
 	halt()
@@ -4441,7 +4450,25 @@ define dep_autopatch_appsrc.erl
 	halt()
 endef
 
-define hex_fetch.erl
+define dep_fetch_git
+	git clone -q -n -- $(call dep_repo,$(1)) $(DEPS_DIR)/$(call dep_name,$(1)); \
+	cd $(DEPS_DIR)/$(call dep_name,$(1)) && git checkout -q $(call dep_commit,$(1));
+endef
+
+define dep_fetch_hg
+	hg clone -q -U $(call dep_repo,$(1)) $(DEPS_DIR)/$(call dep_name,$(1)); \
+	cd $(DEPS_DIR)/$(call dep_name,$(1)) && hg update -q $(call dep_commit,$(1));
+endef
+
+define dep_fetch_svn
+	svn checkout -q $(call dep_repo,$(1)) $(DEPS_DIR)/$(call dep_name,$(1));
+endef
+
+define dep_fetch_cp
+	cp -R $(call dep_repo,$(1)) $(DEPS_DIR)/$(call dep_name,$(1));
+endef
+
+define dep_fetch_hex.erl
 	ssl:start(),
 	inets:start(),
 	{ok, {{_, 200, _}, _, Body}} = httpc:request(get,
@@ -4453,49 +4480,42 @@ define hex_fetch.erl
 	halt()
 endef
 
-define dep_fetch
-	if [ "$(2)" = "git" ]; then \
-		git clone -q -n -- $(3) $(DEPS_DIR)/$(1); \
-		cd $(DEPS_DIR)/$(1) && git checkout -q $(4); \
-	elif [ "$(2)" = "hg" ]; then \
-		hg clone -q -U $(3) $(DEPS_DIR)/$(1); \
-		cd $(DEPS_DIR)/$(1) && hg update -q $(4); \
-	elif [ "$(2)" = "svn" ]; then \
-		svn checkout -q $(3) $(DEPS_DIR)/$(1); \
-	elif [ "$(2)" = "cp" ]; then \
-		cp -R $(3) $(DEPS_DIR)/$(1); \
-	elif [ "$(2)" = "hex" ]; then \
-		$(call erlang,$(call hex_fetch.erl,$(1),$(strip $(4)))); \
-	else \
-		echo "Unknown or invalid dependency: $(1). Please consult the erlang.mk README for instructions." >&2; \
-		exit 78; \
-	fi
+# Hex only has a package version. No need to look in the Erlang.mk packages.
+define dep_fetch_hex
+	$(call erlang,$(call dep_fetch_hex.erl,$(1),$(strip $(word 2,$(dep_$(1))))));
 endef
+
+define dep_fetch_fail
+	echo "Unknown or invalid dependency: $(1). Please consult the erlang.mk README for instructions." >&2; \
+	exit 78;
+endef
+
+# Kept for compatibility purposes with older Erlang.mk configuration.
+define dep_fetch_legacy
+	$(warning WARNING: '$(1)' dependency configuration uses deprecated format.) \
+	git clone -q -n -- $(word 1,$(dep_$(1))) $(DEPS_DIR)/$(1); \
+	cd $(DEPS_DIR)/$(1) && git checkout -q $(if $(word 2,$(dep_$(1))),$(word 2,$(dep_$(1))),master);
+endef
+
+define dep_fetch
+	$(if $(dep_$(1)), \
+		$(if $(dep_fetch_$(word 1,$(dep_$(1)))), \
+			$(word 1,$(dep_$(1))), \
+			legacy), \
+		$(if $(filter $(1),$(PACKAGES)), \
+			$(pkg_$(1)_fetch), \
+			fail))
+endef
+
+dep_name = $(if $(dep_$(1)),$(1),$(pkg_$(1)_name))
+dep_repo = $(patsubst git://github.com/%,https://github.com/%, \
+	$(if $(dep_$(1)),$(word 2,$(dep_$(1))),$(pkg_$(1)_repo)))
+dep_commit = $(if $(dep_$(1)),$(word 3,$(dep_$(1))),$(pkg_$(1)_commit))
 
 define dep_target
 $(DEPS_DIR)/$(1):
 	$(verbose) mkdir -p $(DEPS_DIR)
-ifeq (,$(dep_$(1)))
-	$(dep_verbose) $(call dep_fetch,$(pkg_$(1)_name),$(pkg_$(1)_fetch), \
-		$(patsubst git://github.com/%,https://github.com/%,$(pkg_$(1)_repo)), \
-		$(pkg_$(1)_commit))
-else
-ifeq (1,$(words $(dep_$(1))))
-	$(dep_verbose) $(call dep_fetch,$(1),git, \
-		$(patsubst git://github.com/%,https://github.com/%,$(dep_$(1))), \
-		master)
-else
-ifeq (2,$(words $(dep_$(1))))
-	$(dep_verbose) $(call dep_fetch,$(1),git, \
-		$(patsubst git://github.com/%,https://github.com/%,$(word 1,$(dep_$(1)))), \
-		$(word 2,$(dep_$(1))))
-else
-	$(dep_verbose) $(call dep_fetch,$(1),$(word 1,$(dep_$(1))), \
-		$(patsubst git://github.com/%,https://github.com/%,$(word 2,$(dep_$(1)))), \
-		$(word 3,$(dep_$(1))))
-endif
-endif
-endif
+	$(dep_verbose) $(call dep_fetch_$(strip $(call dep_fetch,$(1))),$(1))
 	$(verbose) if [ -f $(DEPS_DIR)/$(1)/configure.ac -o -f $(DEPS_DIR)/$(1)/configure.in ]; then \
 		echo " AUTO  " $(1); \
 		cd $(DEPS_DIR)/$(1) && autoreconf -Wall -vif -I m4; \
@@ -4530,6 +4550,21 @@ $(foreach dep,$(DEPS),$(eval $(call dep_target,$(dep))))
 
 distclean-deps:
 	$(gen_verbose) rm -rf $(DEPS_DIR)
+
+# External plugins.
+
+DEP_PLUGINS ?=
+
+define core_dep_plugin
+-include $(DEPS_DIR)/$(1)
+
+$(DEPS_DIR)/$(1): $(DEPS_DIR)/$(2) ;
+endef
+
+$(foreach p,$(DEP_PLUGINS),\
+	$(eval $(if $(findstring /,$p),\
+		$(call core_dep_plugin,$p,$(firstword $(subst /, ,$p))),\
+		$(call core_dep_plugin,$p/plugins.mk,$p))))
 
 # Copyright (c) 2015, Loïc Hoguin <essen@ninenines.eu>
 # This file is part of erlang.mk and subject to the terms of the ISC License.
@@ -4637,7 +4672,7 @@ endif
 
 app-build: erlc-include ebin/$(PROJECT).app
 	$(eval GITDESCRIBE := $(shell git describe --dirty --abbrev=7 --tags --always --first-parent 2>/dev/null || true))
-	$(eval MODULES := $(patsubst %,'%',$(sort $(notdir $(basename $(wildcard ebin/*.beam))))))
+	$(eval MODULES := $(patsubst %,'%',$(sort $(notdir $(basename $(shell find ebin -type f -name *.beam))))))
 ifeq ($(wildcard src/$(PROJECT).app.src),)
 	$(app_verbose) echo $(subst $(newline),,$(subst ",\",$(call app_file,$(GITDESCRIBE),$(MODULES)))) \
 		> ebin/$(PROJECT).app
@@ -4658,7 +4693,7 @@ erlc-include:
 	fi
 
 define compile_erl
-	$(erlc_verbose) erlc -v $(ERLC_OPTS) -o ebin/ \
+	$(erlc_verbose) erlc -v $(if $(IS_DEP),$(filter-out -Werror,$(ERLC_OPTS)),$(ERLC_OPTS)) -o ebin/ \
 		-pa ebin/ -I include/ $(filter-out $(ERLC_EXCLUDE_PATHS),\
 		$(COMPILE_FIRST_PATHS) $(1))
 endef
@@ -4753,7 +4788,7 @@ ifneq ($(SKIP_DEPS),)
 test-deps:
 else
 test-deps: $(ALL_TEST_DEPS_DIRS)
-	$(verbose) for dep in $(ALL_TEST_DEPS_DIRS) ; do $(MAKE) -C $$dep; done
+	$(verbose) for dep in $(ALL_TEST_DEPS_DIRS) ; do $(MAKE) -C $$dep IS_DEP=1; done
 endif
 
 ifneq ($(wildcard $(TEST_DIR)),)
@@ -5365,7 +5400,9 @@ CI_OTP ?=
 ifeq ($(strip $(CI_OTP)),)
 ci::
 else
-ci:: $(KERL) $(addprefix ci-,$(CI_OTP))
+ci:: $(addprefix ci-,$(CI_OTP))
+
+ci-prepare: $(addprefix $(CI_INSTALL_DIR)/,$(CI_OTP))
 
 ci-setup::
 
@@ -5374,7 +5411,7 @@ ci_verbose = $(ci_verbose_$(V))
 
 define ci_target
 ci-$(1): $(CI_INSTALL_DIR)/$(1)
-	-$(ci_verbose) \
+	$(ci_verbose) \
 		PATH="$(CI_INSTALL_DIR)/$(1)/bin:$(PATH)" \
 		CI_OTP_RELEASE="$(1)" \
 		CT_OPTS="-label $(1)" \
@@ -5384,9 +5421,11 @@ endef
 $(foreach otp,$(CI_OTP),$(eval $(call ci_target,$(otp))))
 
 define ci_otp_target
-$(CI_INSTALL_DIR)/$(1):
+ifeq ($(wildcard $(CI_INSTALL_DIR)/$(1)),)
+$(CI_INSTALL_DIR)/$(1): $(KERL)
 	$(KERL) build git $(OTP_GIT) $(1) $(1)
 	$(KERL) install $(1) $(CI_INSTALL_DIR)/$(1)
+endif
 endef
 
 $(foreach otp,$(CI_OTP),$(eval $(call ci_otp_target,$(otp))))
@@ -5578,6 +5617,8 @@ distclean-elvis:
 # Configuration.
 
 DTL_FULL_PATH ?= 0
+DTL_PATH ?= templates/
+DTL_SUFFIX ?= _dtl
 
 # Verbosity.
 
@@ -5586,22 +5627,28 @@ dtl_verbose = $(dtl_verbose_$(V))
 
 # Core targets.
 
-define compile_erlydtl
-	$(dtl_verbose) $(ERL) -pa ebin/ $(DEPS_DIR)/erlydtl/ebin/ -eval ' \
-		Compile = fun(F) -> \
-			S = fun (1) -> re:replace(filename:rootname(string:sub_string(F, 11), ".dtl"), "/",  "_",  [{return, list}, global]); \
-				(0) -> filename:basename(F, ".dtl") \
-			end, \
-			Module = list_to_atom(string:to_lower(S($(DTL_FULL_PATH))) ++ "_dtl"), \
-			{ok, _} = erlydtl:compile(F, Module, [{out_dir, "ebin/"}, return_errors, {doc_root, "templates"}]) \
-		end, \
-		_ = [Compile(F) || F <- string:tokens("$(1)", " ")], \
-		halt().'
+define erlydtl_compile.erl
+	[begin
+		Module0 = case $(DTL_FULL_PATH) of
+			0 ->
+				filename:basename(F, ".dtl");
+			1 ->
+				"$(DTL_PATH)" ++ F2 = filename:rootname(F, ".dtl"),
+				re:replace(F2, "/",  "_",  [{return, list}, global])
+		end,
+		Module = list_to_atom(string:to_lower(Module0) ++ "$(DTL_SUFFIX)"),
+		case erlydtl:compile(F, Module, [{out_dir, "ebin/"}, return_errors, {doc_root, "templates"}]) of
+			ok -> ok;
+			{ok, _} -> ok
+		end
+	end || F <- string:tokens("$(1)", " ")],
+	halt().
 endef
 
 ifneq ($(wildcard src/),)
-ebin/$(PROJECT).app:: $(sort $(call core_find,templates/,*.dtl))
-	$(if $(strip $?),$(call compile_erlydtl,$?))
+ebin/$(PROJECT).app:: $(sort $(call core_find,$(DTL_PATH),*.dtl))
+	$(if $(strip $?),\
+		$(dtl_verbose) $(call erlang,$(call erlydtl_compile.erl,$?,-pa ebin/ $(DEPS_DIR)/erlydtl/ebin/)))
 endif
 
 # Copyright (c) 2014 Dave Cottlehuber <dch@skunkwerks.at>
@@ -5824,7 +5871,7 @@ shell: build-shell-deps
 # Copyright (c) 2015, Loïc Hoguin <essen@ninenines.eu>
 # This file is part of erlang.mk and subject to the terms of the ISC License.
 
-ifneq ($(wildcard $(DEPS_DIR)/triq),)
+ifeq ($(filter triq,$(DEPS) $(TEST_DEPS)),triq)
 .PHONY: triq
 
 # Targets.
