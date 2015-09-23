@@ -14,6 +14,5 @@
 # limitations under the License.
 #
 PROJECT = elastic
-DEPS = gproc gun_r18 jsx
-dep_gun_r18 = git https://github.com/shiguredo/gun.git update-ssl-for-otp-18.0
+DEPS = gproc gun jsx
 include erlang.mk

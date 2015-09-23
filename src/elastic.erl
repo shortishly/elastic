@@ -14,6 +14,7 @@
 
 -module(elastic).
 -export([
+         bulk_index_documents/3,
 	 start/0,
 	 make/0,
 	 get_env/1,
@@ -56,6 +57,12 @@ index_document(Index, Type, Id,  #{} = Document) ->
 index_document(Index, Type, Id,  Document) ->
     elastic_http:index(connection(), #{index => index(Index), type => Type, id => Id, document => Document}).
 
+
+-spec bulk_index_documents(index(), iolist(), list()) -> {ok, map()} | {error, binary()}.
+bulk_index_documents(Index, Type, Documents) ->
+    elastic_http:bulk_index(connection(), #{index => index(Index),
+                                       type => Type,
+                                       documents => Documents}).
 
 connection() ->
     {ok, Connection} = elastic_http_supervisor:start_child(tcp_addr(), tcp_port()),
