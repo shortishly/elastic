@@ -105,5 +105,11 @@ create_action(Index, Type, BulkDocument, Document) ->
       <<"\n">>/binary >>.
 
 headers() ->
-    {basic_auth, {elastic_config:elastic_user(),
-                  elastic_config:elastic_pass()}}.
+    
+    Base64 = encode_basic_auth(elastic_config:elastic_user(),
+                                elastic_config:elastic_pass()),
+    BasicAuth = {<<"Authorization">>, <<"Basic ", Base64/binary>>},
+    BasicAuth.
+
+encode_basic_auth(Username, Password) ->
+    base64:encode(Username ++ [$: | Password]).
