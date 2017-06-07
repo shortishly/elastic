@@ -41,7 +41,7 @@ bulk_index(Elastic, Parameters) ->
     gen_server:call(Elastic, {bulk_index, Parameters}, infinity).
 
 init([Host, Port]) ->
-    case gun:open(Host, Port, #{transport => ssl}) of
+    case gun:open(Host, Port, #{transport => ssl, protocols=>[http] }) of
 	{ok, Gun} ->
 	    {ok, #{gun => Gun, response_buffer => <<>>}};
 
@@ -108,8 +108,8 @@ headers() ->
     Base64 = encode_basic_auth(elastic_config:elastic_user(),
                                 elastic_config:elastic_pass()),
      [
-      {"Authorization", "Basic ", Base64/binary}
-     ].
+      {"Authorization", binary_to_list(<<"Basic ", Base64/binary>>)}
+].
 
 encode_basic_auth(Username, Password) ->
     base64:encode(Username ++ [$: | Password]).
