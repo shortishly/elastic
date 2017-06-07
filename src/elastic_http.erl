@@ -41,7 +41,7 @@ bulk_index(Elastic, Parameters) ->
     gen_server:call(Elastic, {bulk_index, Parameters}, infinity).
 
 init([Host, Port]) ->
-    case gun:open(Host, Port, #{transport => ssl, protocols=>[http] }) of
+    case gun:open(Host, Port, #{transport => ssl}) of
 	{ok, Gun} ->
 	    {ok, #{gun => Gun, response_buffer => <<>>}};
 
@@ -50,10 +50,10 @@ init([Host, Port]) ->
     end.
 
 handle_call({index, #{index := Index, type := Type, id := Id, document := Document}}, Reply, #{gun := Gun} = S) ->
-    {noreply, maps:put(gun:put(Gun, [Index, "/", Type, "/", Id], headers(), Document), Reply, S)};
+    {noreply, maps:put(gun:put(Gun, ["/", Index, "/", Type, "/", Id], headers(), Document), Reply, S)};
 
 handle_call({index, #{index := Index, type := Type, document := Document}}, Reply, #{gun := Gun} = S) ->
-    {noreply, maps:put(gun:post(Gun, [Index, "/", Type, "/"], headers(), Document), Reply, S)};
+    {noreply, maps:put(gun:post(Gun, ["/", Index, "/", Type, "/"], headers(), Document), Reply, S)};
 
 handle_call({bulk_index, #{index := Index, type := Type, documents := Documents}}, Reply, #{gun := Gun} = S) ->
 
