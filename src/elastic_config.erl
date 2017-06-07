@@ -27,7 +27,7 @@ elastic_user() ->
     envy(to_list, elastic_user, "elastic").
 
 elastic_pass() ->
-    envy(to_list, elastic_pass, "Bq4ESAXF9vuGRMqvxCWDhpox111").
+    envy(to_list, elastic_pass, "Bq4ESAXF9vuGRMqvxCWDhpox").
 
 elastic_index() ->
      envy(to_list, elastic_index, "logstash"). 
