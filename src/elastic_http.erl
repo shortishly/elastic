@@ -41,7 +41,7 @@ bulk_index(Elastic, Parameters) ->
     gen_server:call(Elastic, {bulk_index, Parameters}, infinity).
 
 init([Host, Port]) ->
-    case gun:open(Host, Port) of
+    case gun:open(Host, Port, #{transport => ssl}) of
 	{ok, Gun} ->
 	    {ok, #{gun => Gun, response_buffer => <<>>}};
 
