@@ -40,7 +40,7 @@ bulk_index(Elastic, Parameters) ->
     gen_server:call(Elastic, {bulk_index, Parameters}, infinity).
 
 init([Host, Port]) ->
-    case gun:open(Host, list_to_integer(Port)) of
+    case gun:open(Host, Port) of
 	{ok, Gun} ->
 	    {ok, #{gun => Gun, response_buffer => <<>>}};
 
@@ -104,4 +104,5 @@ create_action(Index, Type, BulkDocument, Document) ->
       <<"\n">>/binary >>.
 
 headers() ->
-    {basic_auth, {"user", "changeme"}}.
+    {basic_auth, {elastic_config:elastic_user(),
+                  elastic_config:elastic_pass()}}.
