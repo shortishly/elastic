@@ -57,12 +57,11 @@ index_document(Index, Type, Id,  #{} = Document) ->
 index_document(Index, Type, Id,  Document) ->
     elastic_http:index(connection(), #{index => index(Index), type => Type, id => Id, document => Document}).
 
-
 -spec bulk_index_documents(index(), iolist(), list()) -> {ok, map()} | {error, binary()}.
 bulk_index_documents(Index, Type, Documents) ->
     elastic_http:bulk_index(connection(), #{index => index(Index),
-                                       type => Type,
-                                       documents => Documents}).
+                                            type => Type,
+                                            documents => Documents}).
 
 connection() ->
     {ok, Connection} = elastic_http_supervisor:start_child(elastic_config:tcp_host(),
@@ -76,7 +75,7 @@ index(Type) ->
 
 -spec index(index(), calendar:datetime()) -> iolist().
 index(Type, DateTime) ->
-    [get_env(index_prefix), "-", postfix(Type, DateTime)].
+    [elastic_config:elastic_index(), "-", postfix(Type, DateTime)].
 
 
 -spec postfix(index(), calendar:datetime()) -> iolist().
