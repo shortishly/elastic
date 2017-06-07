@@ -65,16 +65,10 @@ bulk_index_documents(Index, Type, Documents) ->
                                        documents => Documents}).
 
 connection() ->
-    {ok, Connection} = elastic_http_supervisor:start_child(tcp_addr(), tcp_port()),
+    {ok, Connection} = elastic_http_supervisor:start_child(elastic_config:tcp_host(),
+                                                           elastic_config:tcp_port()),
     Connection.
 
--spec tcp_addr() -> list().
-tcp_addr() ->
-    get_env(elasticsearch_port_9200_tcp_addr).
-
--spec tcp_port() -> list().
-tcp_port() ->
-    get_env(elasticsearch_port_9200_tcp_port).
 
 -spec index(index()) -> iolist().
 index(Type) ->

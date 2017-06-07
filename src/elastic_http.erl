@@ -49,15 +49,15 @@ init([Host, Port]) ->
     end.
 
 handle_call({index, #{index := Index, type := Type, id := Id, document := Document}}, Reply, #{gun := Gun} = S) ->
-    {noreply, maps:put(gun:put(Gun, [Index, "/", Type, "/", Id], [], Document), Reply, S)};
+    {noreply, maps:put(gun:put(Gun, [Index, "/", Type, "/", Id], [headers()], Document), Reply, S)};
 
 handle_call({index, #{index := Index, type := Type, document := Document}}, Reply, #{gun := Gun} = S) ->
-    {noreply, maps:put(gun:post(Gun, [Index, "/", Type, "/"], [], Document), Reply, S)};
+    {noreply, maps:put(gun:post(Gun, [Index, "/", Type, "/"], [headers()], Document), Reply, S)};
 
 handle_call({bulk_index, #{index := Index, type := Type, documents := Documents}}, Reply, #{gun := Gun} = S) ->
 
     BulkDocument = lists:foldl(fun(Document, Acc) -> create_action(Index, Type, Acc, Document) end, <<>>, Documents),
-    {noreply, maps:put(gun:post(Gun, ["_bulk"], [], BulkDocument), Reply, S)}.
+    {noreply, maps:put(gun:post(Gun, ["_bulk"], [headers()], BulkDocument), Reply, S)}.
 
 handle_cast(stop, S) ->
     {stop, normal, S}.
@@ -102,3 +102,6 @@ create_action(Index, Type, BulkDocument, Document) ->
       <<"\"}}\n">>/binary, 
       JsonDoc/binary, 
       <<"\n">>/binary >>.
+
+headers() ->
+    {basic_auth, {"user", "changeme"}}.
