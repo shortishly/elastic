@@ -17,7 +17,7 @@ default(Default) ->
 
 tcp_host() ->
 %    envy(to_list, elastic_host, "10.16.13.10").
-    envy(to_list, elastic_host, "https://76607d4ec9ba43d4411b7113025a2016.us-east-1.aws.found.io").
+    envy(to_list, elastic_host, "76607d4ec9ba43d4411b7113025a2016.us-east-1.aws.found.io").
 
 tcp_port() ->
   %  envy(to_integer, elastic_port, 9200).
