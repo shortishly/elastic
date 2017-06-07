@@ -17,7 +17,7 @@ default(Default) ->
     [os_env, app_env, {default, Default}].
 
 tcp_host() ->
-    envy(to_binary, elastic_host, <<"10.16.13.10">>).
+    envy(to_list, elastic_host, "10.16.13.10").
 
 tcp_port() ->
     envy(to_integer, elastic_port, 9200).
