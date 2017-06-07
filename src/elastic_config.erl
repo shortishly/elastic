@@ -23,8 +23,8 @@ tcp_port() ->
     envy(to_integer, elastic_port, 9200).
 
 elastic_user() ->
-    envy(to_binary, elastic_user, <<"elastic">>).
+    envy(to_list, elastic_user, "elastic").
 
 elastic_pass() ->
-    envy(to_binary, elastic_pass, <<"changeme">>).
+    envy(to_list, elastic_pass, "changeme").
 
