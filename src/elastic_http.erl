@@ -58,7 +58,7 @@ handle_call({index, #{index := Index, type := Type, document := Document}}, Repl
 handle_call({bulk_index, #{index := Index, type := Type, documents := Documents}}, Reply, #{gun := Gun} = S) ->
 
     BulkDocument = lists:foldl(fun(Document, Acc) -> create_action(Index, Type, Acc, Document) end, <<>>, Documents),
-    {noreply, maps:put(gun:post(Gun, ["_bulk"], headers(), BulkDocument), Reply, S)}.
+    {noreply, maps:put(gun:post(Gun, ["/", "_bulk"], headers(), BulkDocument), Reply, S)}.
 
 handle_cast(stop, S) ->
     {stop, normal, S}.
