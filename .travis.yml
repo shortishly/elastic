@@ -3,5 +3,3 @@ language: erlang
 script: "make"
 otp_release:
   - 19.3
-
-  
