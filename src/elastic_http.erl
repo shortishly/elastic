@@ -25,7 +25,8 @@
 	 handle_call/3,
 	 handle_cast/2,
 	 handle_info/2,
-	 terminate/2
+	 terminate/2,
+	 headers/0
 	]).
 
 start_link(Host, Port) ->
@@ -40,7 +41,7 @@ bulk_index(Elastic, Parameters) ->
     gen_server:call(Elastic, {bulk_index, Parameters}, infinity).
 
 init([Host, Port]) ->
-    case gun:open(Host, list_to_integer(Port)) of
+    case gun:open(Host, Port, #{transport => ssl}) of
 	{ok, Gun} ->
 	    {ok, #{gun => Gun, response_buffer => <<>>}};
 
@@ -49,15 +50,15 @@ init([Host, Port]) ->
     end.
 
 handle_call({index, #{index := Index, type := Type, id := Id, document := Document}}, Reply, #{gun := Gun} = S) ->
-    {noreply, maps:put(gun:put(Gun, [Index, "/", Type, "/", Id], [], Document), Reply, S)};
+    {noreply, maps:put(gun:put(Gun, ["/", Index, "/", Type, "/", Id], headers(), Document), Reply, S)};
 
 handle_call({index, #{index := Index, type := Type, document := Document}}, Reply, #{gun := Gun} = S) ->
-    {noreply, maps:put(gun:post(Gun, [Index, "/", Type, "/"], [], Document), Reply, S)};
+    {noreply, maps:put(gun:post(Gun, ["/", Index, "/", Type, "/"], headers(), Document), Reply, S)};
 
 handle_call({bulk_index, #{index := Index, type := Type, documents := Documents}}, Reply, #{gun := Gun} = S) ->
 
     BulkDocument = lists:foldl(fun(Document, Acc) -> create_action(Index, Type, Acc, Document) end, <<>>, Documents),
-    {noreply, maps:put(gun:post(Gun, ["_bulk"], [], BulkDocument), Reply, S)}.
+    {noreply, maps:put(gun:post(Gun, ["/", "_bulk"], headers(), BulkDocument), Reply, S)}.
 
 handle_cast(stop, S) ->
     {stop, normal, S}.
@@ -102,3 +103,13 @@ create_action(Index, Type, BulkDocument, Document) ->
       <<"\"}}\n">>/binary, 
       JsonDoc/binary, 
       <<"\n">>/binary >>.
+
+headers() ->    
+    Base64 = encode_basic_auth(elastic_config:elastic_user(),
+                                elastic_config:elastic_pass()),
+     [
+      {"Authorization", binary_to_list(<<"Basic ", Base64/binary>>)}
+].
+
+encode_basic_auth(Username, Password) ->
+    base64:encode(Username ++ [$: | Password]).
